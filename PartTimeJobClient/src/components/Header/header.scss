@@ -1,0 +1,143 @@
+.header-area {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    z-index: 1000;
+
+    .logo-img {
+        max-height: 50px;
+        width: auto;
+    }
+
+    .navbar-nav {
+        .nav-link {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 15px;
+            transition: color 0.3s ease;
+
+            &:hover,
+            &.active {
+                color: #007bff;
+            }
+        }
+    }
+
+    .box-header-profile {
+        min-width: 150px;
+        justify-content: space-between;
+        display: flex;
+        align-items: center;
+        color: #333;
+
+
+
+
+        .profile-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .header-name-user {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        &:hover {
+            color: #007bff;
+        }
+    }
+
+    .dropdown-menu {
+        min-width: 200px;
+        border: 1px solid #e5e5e5;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            color: #333;
+            font-size: 14px;
+
+            i {
+                margin-right: 10px;
+            }
+
+            &:hover {
+                background-color: #f8f9fa;
+                color: #007bff;
+            }
+        }
+    }
+
+    .btn {
+        margin-left: 10px;
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &.head-btn1 {
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff;
+
+            &:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+        }
+
+        &.head-btn2 {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+
+            &:hover {
+                background-color: #007bff;
+                color: #fff;
+            }
+        }
+    }
+
+    .navbar-toggler {
+        border: none;
+        padding: 5px;
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+}
+
+@media (max-width: 991px) {
+    .header-area {
+        .navbar-nav {
+            padding: 10px 0;
+
+            .nav-link {
+                padding: 10px 15px;
+            }
+        }
+
+        .btn {
+            margin: 5px 15px;
+        }
+
+        .dropdown-menu {
+            margin: 0 15px;
+        }
+    }
+}
+
+#profileDropdown::after {
+    display: none;
+}

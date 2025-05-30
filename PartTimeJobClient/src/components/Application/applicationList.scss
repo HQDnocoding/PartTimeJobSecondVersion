@@ -1,0 +1,33 @@
+.application-list-container {
+  .application-table {
+    margin-top: 20px;
+    font-size: 0.9rem;
+
+    th {
+      cursor: pointer;
+      background-color: #f8f9fa;
+      &:hover {
+        background-color: #e9ecef;
+      }
+    }
+
+    .application-row {
+      cursor: pointer;
+      &:hover {
+        background-color: #f1f3f5;
+      }
+    }
+
+    td {
+      vertical-align: middle;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+    }
+  }
+
+  .text-center {
+    margin-top: 20px;
+  }
+}

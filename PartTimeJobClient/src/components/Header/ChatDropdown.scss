@@ -1,0 +1,84 @@
+.chat-dropdown-menu {
+    max-width: 350px;
+    min-width: 300px;
+    overflow: hidden;
+    border-radius: 8px;
+
+
+    .chat-room-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+        border-bottom: 1px solid #f1f1f1;
+
+        &:hover {
+            background-color: #f8f9fa;
+        }
+
+        .chat-avatar {
+            margin-right: 15px;
+        }
+
+        .chat-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .chat-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 5px;
+
+                .receiver-name {
+                    font-weight: 600;
+                    font-size: 0.7rem;
+                }
+
+                .message-timestamp {
+                    font-size: 0.65rem;
+                }
+            }
+
+            .latest-message {
+
+                display: flex;
+                align-items: center;
+                font-size: 0.65rem;
+
+                .message-text {
+                    flex: 1;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .unread-dot {
+                    color: red;
+                    font-size: 1rem;
+                    margin-left: 10px;
+                }
+            }
+        }
+    }
+
+    .dropdown-item.disabled {
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+.loading-spinner {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+}
+
+
+#chatDropdown::after {
+    display: none;
+}

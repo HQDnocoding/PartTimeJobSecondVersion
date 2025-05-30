@@ -1,0 +1,212 @@
+/* =================== AUTHENTICATION PAGE =================== */
+.container-scroller {
+  width: 100%;
+  min-height: 100vh; /* Đổi từ height thành min-height để nội dung có thể mở rộng */
+  overflow-y: auto; /* Bật thanh cuộn dọc khi nội dung vượt quá */
+}
+
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.page-body-wrapper {
+  &.full-page-wrapper {
+    min-height: 100vh; /* Đổi thành min-height để không giới hạn nội dung */
+    display: flex;
+    align-items: flex-start; /* Đổi từ center thành flex-start để nội dung bắt đầu từ trên */
+    justify-content: center;
+    background: #f4f5f7;
+  }
+}
+
+.content-wrapper {
+  &.auth {
+    padding: 0 20px;
+    display: flex;
+    align-items: flex-start; /* Đổi từ center thành flex-start */
+    width: 100%; /* Đảm bảo chiếm toàn chiều rộng */
+  }
+}
+
+.row {
+  width: 100%;
+  margin: 0;
+}
+
+.col-lg-4 {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.auth-form-light {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 50px 40px;
+  text-align: left;
+
+  .brand-logo {
+    margin-bottom: 35px;
+    text-align: center;
+
+    img {
+      max-width: 140px;
+      height: auto;
+    }
+  }
+
+  h4 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 12px;
+  }
+
+  .font-weight-light {
+    font-size: 18px;
+    color: #666;
+    font-weight: 400;
+    margin-bottom: 25px;
+
+    &.mt-4 {
+      margin-top: 30px;
+      text-align: center;
+
+      a.text-primary {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #0056b3;
+          text-decoration: z;
+        }
+      }
+    }
+  }
+
+  form {
+    padding-top: 25px;
+
+    .form-group {
+      margin-bottom: 25px;
+
+      .form-control {
+        &.form-control-lg {
+          padding: 14px 20px;
+          font-size: 18px;
+          border-radius: 10px;
+          border: 1px solid #ddd;
+          transition: border-color 0.3s ease;
+
+          &:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
+          }
+
+          &::placeholder {
+            color: #aaa;
+          }
+        }
+      }
+    }
+
+    .mt-3 {
+      margin-top: 30px;
+
+      .btn1 {
+        text-decoration: none;
+        &.btn1-block {
+          display: block;
+          width: fit-content;
+        }
+
+        &.btn1-primary1 {
+          background: #007bff;
+          color: white;
+          border: none;
+        }
+
+        &.btn1-lg {
+          padding: 16px 20px;
+          font-size: 18px;
+          border-radius: 10px;
+        }
+
+        &.font-weight-medium {
+          font-weight: 500;
+        }
+
+        &.auth-form-btn1 {
+          transition: background 0.3s ease;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+      }
+    }
+
+    .my-2 {
+      margin: 25px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .form-check {
+        .form-check-label {
+          &.text-muted {
+            color: #888;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+
+            .form-check-input {
+              margin-right: 10px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+
+      .auth-link {
+        &.text-black {
+          color: #007bff;
+          text-decoration: none;
+          font-size: 16px;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #0056b3;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* =================== RESPONSIVE =================== */
+@media (max-width: 768px) {
+  .content-wrapper {
+    &.auth {
+      padding: 30px;
+    }
+  }
+
+  .col-lg-4 {
+    max-width: 100%;
+    padding: 0 20px;
+
+    .auth-form-light {
+      padding: 40px 30px;
+    }
+  }
+}

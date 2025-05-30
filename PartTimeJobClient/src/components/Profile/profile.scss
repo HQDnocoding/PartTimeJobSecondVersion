@@ -1,0 +1,146 @@
+.profile-container {
+  margin: 0 auto;
+  padding: 40px 20px;
+  max-width: 80vw;
+}
+
+.profile-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.profile-image-section {
+  background: linear-gradient(135deg, #6b48ff, #00d2ff);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 5px solid white;
+    border-radius: 360px;
+    margin-bottom: 25px;
+  }
+
+  .profile-username {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .profile-role {
+    font-size: 1rem;
+    padding: 8px 15px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .profile-applications-button {
+    width: 100%;
+    max-width: 200px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+}
+
+.profile-details-section {
+  padding: 40px;
+  text-align: start;
+
+  .profile-fullname {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+  }
+
+  .profile-divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin-bottom: 30px;
+  }
+
+  .profile-info-row {
+    margin-bottom: 30px;
+
+    .profile-label {
+      font-weight: 500;
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    a.profile-link {
+      color: #6b48ff;
+      text-decoration: none;
+      font-size: 1.1rem;
+
+      &:hover {
+        text-decoration: underline;
+        color: #00d2ff;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
+  }
+
+  .profile-card {
+    flex-direction: column;
+  }
+
+  .profile-image-section,
+  .profile-details-section {
+    padding: 25px;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-fullname {
+    font-size: 1.8rem;
+  }
+
+  .profile-info-row {
+    margin-bottom: 20px;
+  }
+
+  .workplace-image {
+    height: 200px;
+  }
+}
+
+.workplace-carousel {
+  max-width: 100%;
+  margin-top: 1rem;
+}
+
+.workplace-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 5px;
+}

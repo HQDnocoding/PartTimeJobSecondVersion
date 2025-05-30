@@ -1,0 +1,11 @@
+/shelf/
+/workspace.xml
+.env
+.idea/
+target/
+application.properties
+mail.properties
+/target/
+target
+/target
+src/main/resources/

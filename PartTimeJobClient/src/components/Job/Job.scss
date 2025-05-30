@@ -1,0 +1,156 @@
+/* =================== JOB ITEM STYLING =================== */
+.job-items {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease;
+  
+    &:hover {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .company-img {
+    margin-right: 20px;
+  
+    a {
+      display: block;
+  
+      img {
+        width: 85px; /* Giữ nguyên kích thước từ inline style */
+        height: 85px;
+        object-fit: contain; /* Đảm bảo ảnh không bị méo */
+        border-radius: 8px;
+        border: 1px solid #eee;
+      }
+    }
+  }
+  
+  .job-tittle {
+    &.job-tittle2 {
+      flex-grow: 1; /* Chiếm phần còn lại của không gian */
+  
+      a {
+        text-decoration: none;
+  
+        h4 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 10px;
+          transition: color 0.3s ease;
+  
+          &:hover {
+            color: #007bff; /* Màu xanh khi hover */
+          }
+        }
+      }
+  
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* Khoảng cách giữa các mục */
+  
+        li {
+          font-size: 14px;
+          color: #666;
+          display: flex;
+          align-items: center;
+  
+          i.fas.fa-map-marker-alt {
+            margin-right: 5px;
+            color: #999;
+          }
+        }
+      }
+    }
+  }
+  
+  .items-link {
+    &.items-link2 {
+      position: relative;
+      text-align: right;
+  
+      &.f-right {
+        margin-left: auto; /* Đẩy sang phải */
+      }
+  
+      a {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #f4f5f7;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 5px;
+        transition: background 0.3s ease, color 0.3s ease;
+  
+        &:hover {
+          background: #007bff;
+          color: #fff;
+        }
+      }
+  
+      span {
+        position: absolute;
+        right: 70px; /* Giữ nguyên từ inline style */
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: #888;
+      }
+    }
+  }
+  
+  /* =================== RESPONSIVE =================== */
+  @media (max-width: 768px) {
+    .job-items {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 15px;
+    }
+  
+    .company-img {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+  
+    .job-tittle {
+      &.job-tittle2 {
+        ul {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    }
+  
+    .items-link {
+      &.items-link2 {
+        &.f-right {
+          margin-left: 0;
+          text-align: left;
+          width: 100%;
+        }
+  
+        a {
+          width: 100%;
+          text-align: center;
+        }
+  
+        span {
+          position: static;
+          display: block;
+          margin-top: 10px;
+          transform: none;
+        }
+      }
+    }
+  }

@@ -1,0 +1,169 @@
+/* =================== JOB CATEGORY LISTING =================== */
+.job-category-listing {
+    &.mb-50 {
+      margin-bottom: 50px;
+    }
+  
+    .single-listing {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+  
+      .small-section-tittle2 {
+        margin-bottom: 20px;
+  
+        h4 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+          margin: 0;
+        }
+      }
+  
+      .select-job-items2 {
+        select {
+          width: 100%;
+          padding: 12px 15px;
+          font-size: 16px;
+          color: #555;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          background: #fff;
+          appearance: none; /* Xóa kiểu mặc định của select */
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); /* Icon mũi tên */
+          background-repeat: no-repeat;
+          background-position: right 15px center;
+          cursor: pointer;
+          transition: border-color 0.3s ease;
+  
+          &:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+          }
+        }
+      }
+  
+      .select-Categories {
+        &.pt-80 {
+          padding-top: 80px;
+        }
+  
+        &.pb-50 {
+          padding-bottom: 50px;
+        }
+  
+        .small-section-tittle2 {
+          margin-bottom: 20px;
+        }
+  
+        .container {
+          position: relative;
+          display: block;
+          padding-left: 35px;
+          margin-bottom: 15px;
+          font-size: 16px;
+          color: #555;
+          cursor: pointer;
+          user-select: none;
+  
+          input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+  
+            &:checked ~ .checkmark {
+              background: #007bff;
+              border-color: #007bff;
+  
+              &::after {
+                display: block;
+              }
+            }
+          }
+  
+          .checkmark {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+  
+            &::after {
+              content: '';
+              position: absolute;
+              display: none;
+              left: 6px;
+              top: 2px;
+              width: 6px;
+              height: 10px;
+              border: solid #fff;
+              border-width: 0 2px 2px 0;
+              transform: rotate(45deg);
+            }
+          }
+  
+          &:hover {
+            .checkmark {
+              border-color: #007bff;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  /* =================== RESPONSIVE =================== */
+  @media (max-width: 768px) {
+    .job-category-listing {
+      &.mb-50 {
+        margin-bottom: 30px;
+      }
+  
+      .single-listing {
+        padding: 15px;
+  
+        .select-job-items2 {
+          select {
+            padding: 10px 12px;
+            font-size: 14px;
+          }
+        }
+  
+        .select-Categories {
+          &.pt-80 {
+            padding-top: 50px;
+          }
+  
+          &.pb-50 {
+            padding-bottom: 30px;
+          }
+  
+          .container {
+            font-size: 14px;
+            padding-left: 30px;
+  
+            .checkmark {
+              height: 18px;
+              width: 18px;
+  
+              &::after {
+                left: 5px;
+                top: 1px;
+                width: 5px;
+                height: 9px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
