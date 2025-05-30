@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý đơn ứng tuyển</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <style>
+        .table-responsive thead {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: #fff;
+        }
+        .pagination {
+            justify-content: flex-start;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .table-section {
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    <main class="container column-gap-3 min-vh-90" style="display: flex; flex-direction: row">
+        <div style="flex-grow: 3; max-height: 90vh; overflow-y: auto" class="table-responsive">
+            <div class="d-flex flex-column h-100">
+                <div class="header-section" style="flex: 0;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+                        <h5>Danh sách đơn ứng tuyển</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Hành động
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="actionDropdown">
+                                <li><a class="dropdown-item" th:onclick="'deleteRecord(event, \'' + @{/api/admin/applications} + '\',  \'.application-checkbox:checked\')'" id="deleteSelected">Xóa</a></li>
+                                <li><a class="dropdown-item" th:href="@{/applications/create-application}" id="deleteSelected">Tạo mới</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination-section" style="flex: 0;">
+                    <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/applications(page=${currentPage - 1}, status=${param.status}, candidateName=${param.candidateName}, jobName=${param.jobName})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" onclick="" th:href="@{/applications(page=${i}, status=${param.status}, candidateName=${param.candidateName}, jobName=${param.jobName})}" th:text="${i}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/applications(page=${currentPage + 1}, status=${param.status}, candidateName=${param.candidateName}, jobName=${param.jobName})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="table-section" style="flex: 8; overflow-y: auto;">
+                    <table class="table caption-top">
+                        <thead class="position-sticky top-0 z-3">
+                            <tr>
+                                <th scope="col"><input type="checkbox" id="selectAll"></th>
+                                <th scope="col" th:each="h : ${headCols}" th:text="${h}"></th>
+                                <th scope="col" th:if="${#lists.isEmpty(headCols)}">Không có cột nào được định nghĩa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="a ,stat : ${applications}" th:if="${a != null}">
+                                <td><input type="checkbox" class="application-checkbox" th:value="${a.id}"></td>
+
+                                <td th:text="${stat.count + (currentPage-1)*pageSize }"></td>
+                                <td><a th:href="@{/applications/{id}(id=${a.id})}" th:text="${a.candidateId.fullName}"></a></td>
+                                <!--                                <td th:text="${a.curriculumVitae}"></td>-->
+                                <td th:text="${a.appliedDate}"></td>
+                                <!--<td style="word-wrap: break-word; white-space: normal" th:text="${a.message}"></td>-->
+                                <td th:switch="${a.status}">
+                                    <span th:case="'approved'" class="text-success" th:text="${a.status}"></span>
+                                    <span th:case="'pending'" class="text-warning" th:text="${a.status}"></span>
+                                    <span th:case="'refused'" class="text-danger" th:text="${a.status}"></span>
+                                    <span th:case="*" th:text="${a.status}"></span>
+                                </td>
+                                <td th:text="${a.jobId.jobName}"></td>
+                            </tr>
+                            <tr th:if="${applications == null or #lists.isEmpty(applications)}">
+                                <td colspan="8" class="text-center">Không có dữ liệu</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div style="flex-grow: 2">
+            <form th:action="@{/applications}" method="get" class="p-3 bg-light rounded" onsubmit="removeEmptyParams(this)">
+                <h5 class="mb-3">Tìm kiếm đơn ứng tuyển</h5>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Trạng thái</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="" th:selected="${param.status == null}">Tất cả</option>
+                        <option value="pending" th:selected="${param.status == 'pending'}">Pending</option>
+                        <option value="approved" th:selected="${param.status == 'approved'}">Approved</option>
+                        <option value="refused" th:selected="${param.status == 'refused'}">Refused</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="candidateName" class="form-label">Tên ứng viên</label>
+                    <input type="text" class="form-control" id="candidateName" name="candidateName" th:value="${param.candidateName}" placeholder="Nhập tên ứng viên...">
+                </div>
+                <div class="mb-3">
+                    <label for="jobName" class="form-label">Tên công việc</label>
+                    <input type="text" class="form-control" id="jobName" name="jobName" th:value="${param.jobName}" placeholder="Nhập tên công việc...">
+                </div>
+                <!-- Giữ tham số phân trang -->
+                <!--<input type="hidden" name="page" th:value="${currentPage}">-->
+                <!--<input type="hidden" name="size" th:value="${pageSize}">-->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <a th:href="@{/applications}" class="btn btn-secondary">Xóa bộ lọc</a>
+                </div>
+            </form>
+        </div>
+    </main>
+    <div th:replace="base :: footer"></div>
+
+    <script>
+        // Chọn tất cả checkbox
+        document.getElementById('selectAll').addEventListener('change', function () {
+            document.querySelectorAll('.application-checkbox').forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    </script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

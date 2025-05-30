@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>Chi tiết ứng viên</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <th:block th:replace="~{base :: bootstrap}"></th:block>
+    <script th:inline="javascript">
+        var object = /*[[${candidate}]]*/ {};
+    </script>
+    <script th:src="@{/js/cityDistrictLoad.js}" defer></script>
+    <style>
+        .candidate-avatar {
+            max-width: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .table {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+
+    <main class="container my-5">
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div id="errorAlert" th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <form id="updateCandidate" th:action="@{'/candidates/' + ${candidate.id} + '/update'}" method="post" enctype="multipart/form-data" th:object="${candidate}">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Chi tiết ứng viên</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Avatar -->
+                        <div class="col-md-4 text-center mb-4">
+                            <img th:src="${candidate.avatar}" alt="Avatar ứng viên" class="img-fluid candidate-avatar"/>
+                            <div class="mt-2">
+                                <label for="avatarFile" class="form-label">Tải ảnh đại diện mới</label>
+                                <input type="file" id="avatarFile" class="form-control" accept="image/*" th:field="*{avatarFile}"/>
+                            </div>
+                        </div>
+                        <!-- Thông tin ứng viên -->
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="fullName" class="form-label">Họ tên</label>
+                                <input type="text" id="fullName" class="form-control" th:field="*{fullName}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="userId" disabled  class="form-control" th:field="*{userId.username}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="dateOfBirth" class="form-label">Ngày sinh</label>
+                                <input type="date" id="dateOfBirth" class="form-control" th:field="*{dateOfBirth}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Thành phố</label>
+                                <select id="city" class="form-select" th:field="*{city}">
+                                    <option value="">Chọn thành phố</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="tel" id="phone" class="form-control" th:field="*{phone}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="selfDescription" class="form-label">Mô tả bản thân</label>
+                                <textarea id="selfDescription" class="form-control" rows="5" th:field="*{selfDescription}"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="curriculumVitaeFile" class="form-label">Tải CV mới (PDF)</label>
+                                <input type="file" id="curriculumVitaeFile" class="form-control" accept=".pdf" th:field="*{curriculumVitaeFile}"/>
+                                <div th:if="${candidate.curriculumVitae}">
+                                    <a th:href="${candidate.curriculumVitae}" target="_blank" class="btn btn-link">Xem CV hiện tại</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <button id="submitButton" type="submit" class="btn btn-primary">Lưu</button>
+                    <a class="btn btn-danger" th:onclick="'deleteObject(event, \'' + @{/api/admin/candidates} + '\', ' + *{id} + ')'"
+                       >Xóa</a>
+                    <a href="/candidates" class="btn btn-secondary">Quay lại danh sách</a>
+                </div>
+            </div>
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{avatar}" />
+            <input type="hidden" th:field="*{curriculumVitae}" />
+            <input type="hidden" th:field="*{userId}"/>
+        </form>
+    </main>
+
+    <div th:replace="~{base :: footer}"></div>
+    <script>
+        document.getElementById('updateCandidate').addEventListener('submit', function (e) {
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

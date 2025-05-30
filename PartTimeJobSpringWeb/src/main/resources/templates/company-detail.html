@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>Chi tiết công ty</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <script th:inline="javascript">
+        var object = /*[[${company}]]*/ {};
+    </script>
+    <script th:src="@{/js/cityDistrictLoad.js}"></script>
+    <style>
+        .company-avatar {
+            max-width: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .carousel img {
+            max-height: 400px;
+            object-fit: cover;
+        }
+        .image-preview {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .image-preview img {
+            max-width: 150px;
+            border-radius: 5px;
+        }
+        .image-preview .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+        .url-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+
+    <main class="container my-5">
+        <form id="updateCompany" th:action="@{'/companies/' + ${company.id} + '/update'}" method="post" enctype="multipart/form-data" th:object="${company}">
+            <div class="card shadow-lg border-0">
+                <div id="errorAlert" th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                </div>
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Chi tiết công ty</h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Avatar -->
+                        <div class="col-md-4 text-center mb-4">
+                            <img th:src="${company.avatar}" alt="Avatar công ty" class="img-fluid company-avatar"/>
+                            <div class="mt-2">
+                                <label for="avatarFile" class="form-label">Tải ảnh đại diện mới</label>
+                                <input type="file" id="avatarFile" name="avatarFile" class="form-control" accept="image/*" th:field="*{avatarFile}"/>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin công ty -->
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Tên công ty</label>
+                                <input type="text" id="name" name="name" class="form-control" th:field="*{name}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taxCode" class="form-label">Mã số thuế</label>
+                                <input type="text" id="taxCode" name="taxCode" class="form-control" th:field="*{taxCode}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fullAddress" class="form-label">Địa chỉ</label>
+                                <input type="text" id="fullAddress" name="fullAddress" class="form-control" th:field="*{fullAddress}" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" disabled class="form-control" th:field="*{userId.username}" required/>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="city" class="form-label">Thành phố</label>
+                                    <select  id="city" name="city" class="form-select" th:field="*{city}">
+                                        <option value="">Chọn thành phố</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+
+                                    <label for="district" class="form-label">Quận/Huyện</label>
+                                    <select id="district" name="district" class="form-select" th:field="*{district}">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <span class="badge" th:switch="${company.status}"
+                                      th:classappend="
+                                      ${company.status == 'approved'} ? 'bg-success' :
+                                      (${company.status == 'refused'} ? 'bg-danger' : 'bg-warning')">
+                                    <span th:case="'approved'">Đã duyệt</span>
+                                    <span th:case="'refused'">Bị từ chối</span>
+                                    <span th:case="*">Chờ xử lý</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mô tả -->
+                    <hr/>
+                    <h4>Mô tả công ty</h4>
+                    <div class="mb-3">
+                        <label for="selfDescription" class="form-label">Mô tả</label>
+                        <textarea id="selfDescription" name="selfDescription" class="form-control" rows="5" th:field="*{selfDescription}" ></textarea>
+                    </div>
+
+                    <!-- Hình ảnh nơi làm việc -->
+                    <hr/>
+                    <h4>Hình ảnh nơi làm việc</h4>
+                    <div th:if="${#lists.isEmpty(company.imageWorkplaceCollection) == false}">
+                        <div id="carouselWorkplace" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div th:each="img, iterStat : ${company.imageWorkplaceCollection}"
+                                     th:class="'carousel-item' + (${iterStat.first} ? ' active' : '')">
+                                    <img th:src="${img.imageUrl}" style="object-fit: contain" class="d-block w-100 rounded" alt="Hình ảnh nơi làm việc"/>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselWorkplace" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Trước</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselWorkplace" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Sau</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(company.imageWorkplaceCollection)}">
+                        <p class="text-muted">Không có hình ảnh nơi làm việc.</p>
+                    </div>
+
+                    <!-- Quản lý hình ảnh nơi làm việc -->
+                    <!--<hr/>-->
+<!--                    <h4>Quản lý hình ảnh nơi làm việc</h4>
+                    <div id="imagePreviewContainer" class="mb-3">
+                        <div th:each="img, iterStat : ${company.imageWorkplaceCollection}" class="image-preview">
+                            <img th:src="${img.imageUrl}" alt="Hình ảnh nơi làm việc"/>
+                            <button type="button" class="remove-btn" th:onclick="'removeImage(' + ${iterStat.index} + ')'">X</button>
+                        </div>
+                    </div>-->
+<!--                    <div class="url-input-container">
+                        <input type="url" id="newImageUrl" class="form-control" placeholder="Nhập URL ảnh"/>
+                        <button type="button" class="btn btn-secondary" onclick="addImageUrl()">Thêm URL</button>
+                    </div>-->
+
+                    <!-- Duyệt hồ sơ -->
+                    <hr/>
+                    <div>
+                        <h4>Duyệt hồ sơ công ty</h4>
+                        <div th:if="${company.status == 'pending'}">
+                            <div class="row g-3 align-items-center mb-3">
+                                <div class="col-auto">
+                                    <label for="status" class="form-label">Trạng thái</label>
+                                </div>
+                                <div class="col-auto">
+                                    <select id="status" name="status" class="form-select" th:field="*{status}">
+                                        <option value="pending" hidden/>
+                                        <option value="approved">Duyệt</option>
+                                        <option value="refused">Từ chối</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${company.status == 'pending'}">
+                            <input type="hidden" th:field="*{status}" />
+                            <p>Trạng thái hiện tại: <strong th:text="${company.status == 'approved' ? 'Đã duyệt' : (company.status == 'refused' ? 'Bị từ chối' : 'Chờ xử lý')}"></strong>. Không thể cập nhật.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer nút thao tác -->
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <button id="submitButton" type="submit" class="btn btn-primary">Lưu</button>
+                    <a   th:onclick="'deleteObject(event, \'' + @{/api/admin/companies} + '\', ' + *{id} + ')'" class="btn btn-danger"
+                         >Xóa</a>
+                    <a th:href="@{/companies}" class="btn btn-secondary">Quay lại danh sách</a>
+                </div>
+            </div>
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{avatar}"/>
+            <input type="hidden" th:field="*{userId}"/>
+        </form>
+    </main>
+
+    <div th:replace="base :: footer"></div>
+    <script>
+        function removeImage(index) {
+            const container = document.querySelector(`#imagePreviewContainer .image-preview:nth-child(${index + 1})`);
+            if (container) {
+                container.remove();
+            }
+        }
+
+        function addImageUrl() {
+            const urlInput = document.getElementById('newImageUrl');
+            const url = urlInput.value.trim();
+            if (url && isValidUrl(url)) {
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const index = document.querySelectorAll('#imagePreviewContainer .image-preview').length;
+                const div = document.createElement('div');
+                div.className = 'image-preview';
+                div.innerHTML = `
+                    <img src="${url}" alt="Hình ảnh mới"/>
+                    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">X</button>
+                    <input type="hidden" name="newImages[${index}]" value="${url}"/>
+                `;
+                previewContainer.appendChild(div);
+                urlInput.value = '';
+            } else {
+                alert('Vui lòng nhập URL hợp lệ!');
+            }
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        document.getElementById('updateCompany').addEventListener('submit', function (e) {
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

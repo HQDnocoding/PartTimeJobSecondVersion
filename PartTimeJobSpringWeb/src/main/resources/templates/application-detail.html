@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Chi tiết đơn ứng tuyển</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <style>
+        .status-approved {
+            color: #198754; /* Bootstrap's success color */
+            font-weight: 600;
+        }
+        .status-pending {
+            color: #fd7e14; /* Bootstrap's warning/orange */
+            font-weight: 600;
+        }
+        .status-refused {
+            color: #dc3545; /* Bootstrap's danger color */
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    <main class="container py-5">
+        <div class="card shadow mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+                <!-- Thông báo lỗi -->
+                <div th:if="${error != null}" class="alert alert-danger text-center" role="alert">
+                    <span th:text="${error}"></span>
+                </div>
+
+                <!-- Thông báo thành công -->
+                <div th:if="${success != null}" class="alert alert-success text-center" role="alert">
+                    <span th:text="${success}"></span>
+                </div>
+
+                <!-- Hiển thị và chỉnh sửa đơn ứng tuyển -->
+                <div th:if="${appli != null}">
+                    <form id="updateApp" th:action="@{'/applications/' + ${appli.id} + '/update'}"  method="post" enctype="multipart/form-data" th:object="${appli}">
+                        <h3 class="card-title mb-4">Chi tiết đơn ứng tuyển: <span th:text="${appli.id}"></span></h3>
+                        <div class="mb-4">
+                            <!-- CV -->
+                            <div class="mb-3">
+                                <label for="curriculumVitae" class="form-label">CV (PDF)</label>
+                                <input type="file" id="curriculumVitae" class="form-control" accept=".pdf" th:field="*{curriculumVitaeFile}"/>
+                                <div th:if="${appli.curriculumVitae != null}">
+                                    <a th:href="@{${appli.curriculumVitae}}" target="_blank" class="btn btn-link">Xem CV hiện tại</a>
+                                </div>
+                                <span th:if="${appli.curriculumVitae == null}" class="text-muted">Không có CV</span>
+                            </div>
+
+                            <!-- Ngày ứng tuyển -->
+                            <div class="mb-3">
+                                <label for="appliedDate" class="form-label">Ngày ứng tuyển</label>
+                                <input type="date" id="appliedDate" class="form-control" th:field="*{appliedDate}" required/>
+                            </div>
+
+                            <!-- Lời nhắn -->
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Lời nhắn</label>
+                                <textarea id="message" class="form-control" rows="4" th:field="*{message}"></textarea>
+                            </div>
+
+                            <!-- Trạng thái -->
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <span class="badge" th:switch="${appli.status}"
+                                      th:classappend="
+                                      ${appli.status == 'approved'} ? 'bg-success' :
+                                      (${appli.status == 'refused'} ? 'bg-danger' : 'bg-warning')">
+                                    <span th:case="'approved'" th:text="${appli.status}"></span>
+                                    <span th:case="'refused'" th:text="${appli.status}"></span>
+                                    <span th:case="*" th:text="${appli.status}"></span>
+                                </span>
+                            </div>
+
+                            <!-- Ứng viên -->
+                            <div class="mb-3">
+                                <label for="candidateId" class="form-label">Ứng viên</label>
+                                <select id="candidateId" class="form-select" th:field="*{candidateId}" required>
+                                    <option value="">Chọn ứng viên</option>
+                                    <option th:each="candidate : ${candidates}"
+                                            th:value="${candidate.id}"
+                                            th:text="${candidate.fullName}"
+                                            th:selected="${candidate.id == appli.candidateId}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Công việc -->
+                            <div class="mb-3">
+                                <label for="jobId" class="form-label">Công việc</label>
+                                <select id="jobId" class="form-select" th:field="*{jobId}" required>
+                                    <option value="">Chọn công việc</option>
+                                    <option th:each="job : ${jobs}"
+                                            th:value="${job.id}"
+                                            th:text="${job.jobName}"
+                                            th:selected="${job.id == appli.jobId}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button id="submitButton" type="submit" class="btn btn-primary">Lưu</button>
+                            <a class="btn btn-danger" th:onclick="'deleteObject(event, \'' + @{/api/admin/applications} + '\', ' + *{id} + ')'"
+                               >Xóa</a>
+                            <a th:href="@{/applications}" class="btn btn-secondary">Quay lại danh sách</a>
+                        </div>
+
+                        <div>
+                            <h4>Duyệt đơn ứng tuyển</h4>
+                            <div th:if="${appli.status == 'pending'}">
+                                <div class="row g-3 align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <label for="status" class="form-label">Trạng thái</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select id="status" class="form-select" th:field="*{status}">
+                                            <option value="pending" hidden/>
+                                            <option value="approved">Duyệt</option>
+                                            <option value="refused">Từ chối</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:unless="${appli.status == 'pending'}">
+                                <input type="hidden" th:field="*{status}" />
+                                <p>Trạng thái hiện tại: <strong th:text="${appli.status}">Trạng thái</strong>. Không thể cập nhật.</p>
+                            </div>
+                        </div>
+                        <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" th:field="*{curriculumVitae}"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="base :: footer"></div>
+    <script>
+        document.getElementById('updateApp').addEventListener('submit', function (e) {
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
+</html>

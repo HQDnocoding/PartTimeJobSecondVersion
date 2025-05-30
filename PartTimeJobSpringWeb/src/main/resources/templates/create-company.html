@@ -1,0 +1,224 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>Tạo nhà tuyển dụng</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <style>
+        #imageWorkplacePreview .img-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        #imageWorkplacePreview img {
+            max-width: 150px;
+            max-height: 120px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #imageWorkplacePreview .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body class="bg-light">
+    <div th:replace="base :: header"></div>
+
+    <div class="container my-5">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Tạo nhà tuyển dụng</h2>
+                <form id="createCompanyForm" th:object="${companyDTO}" th:action="@{'/companies'}" method="post"
+                      class="row g-3" enctype="multipart/form-data">
+                    <!-- Thông tin công ty -->
+                    <div id="message" class="mt-3 text-center">
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+                    </div>
+                    <div class="col-12">
+                        <h4 class="border-bottom pb-2 mb-4">Thông Tin Công Ty</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Tên Công Ty *</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}" required
+                               placeholder="Nhập tên công ty">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="avatar" class="form-label">Hình Đại Diện * (JPG/PNG)</label>
+                        <input type="file" class="form-control" id="avatar" th:field="*{avatarFile}"
+                               accept="image/jpeg,image/png" required/>
+                        <div class="mt-2 position-relative" style="max-width: 150px;">
+                            <img id="avatarPreview" class="img-fluid rounded" style="display: none;"
+                                 alt="Xem trước ảnh đại diện"/>
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                    style="display: none;" onclick="removeAvatar()">×
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="taxCode" class="form-label">Mã Số Thuế *</label>
+                        <input type="text" class="form-control" id="taxCode" th:field="*{taxCode}" required
+                               placeholder="Nhập mã số thuế">
+                    </div>
+                    <div class="col-12">
+                        <label for="fullAddress" class="form-label">Địa Chỉ Đầy Đủ *</label>
+                        <input type="text" class="form-control" id="fullAddress" th:field="*{fullAddress}" required
+                               placeholder="Nhập địa chỉ đầy đủ">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Thành Phố *</label>
+                        <select class="form-select" id="city" th:field="*{city}" required>
+                            <option value="">Chọn thành phố</option>
+                        </select>
+                        <div class="invalid-feedback">Vui lòng chọn thành phố.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="district" class="form-label">Quận/Huyện *</label>
+                        <select class="form-select" id="district" th:field="*{district}" required>
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                        <div class="invalid-feedback">Vui lòng chọn quận/huyện.</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="selfDescription" class="form-label">Mô Tả Công Ty</label>
+                        <textarea class="form-control" id="selfDescription" th:field="*{selfDescription}" rows="4"
+                                  placeholder="Nhập mô tả công ty (tùy chọn)"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="imageWorkplaceFiles" class="form-label">Hình Ảnh Nơi Làm Việc * (Tối thiểu 3 ảnh,
+                            JPG/PNG)</label>
+                        <input type="file" class="form-control" id="imageWorkplaceFiles" th:field="*{files}"
+                               accept="image/jpeg,image/png" multiple/>
+                        <small class="form-text text-muted">Chọn ít nhất 3 hình ảnh nơi làm việc.</small>
+
+                        <div id="imageWorkplacePreview" class="mt-3 d-flex flex-wrap gap-3"></div>
+                    </div>
+
+                    <!-- Thông tin người dùng -->
+                    <div class="col-12 mt-4">
+                        <h4 class="border-bottom pb-2 mb-4">Thông Tin Người Dùng</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Tên Đăng Nhập *</label>
+                        <input type="email" class="form-control" id="username" th:field="*{username}" required
+                               placeholder="Nhập tên đăng nhập">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Mật Khẩu *</label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}" required
+                               placeholder="Nhập mật khẩu">
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button id="submitButton" type="submit" class="btn btn-primary w-100">Tạo</button>
+                    </div>
+                </form>
+                <div id="message" class="mt-3 text-center"></div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="base :: footer"></div>
+    <script th:src="@{/js/cityDistrictLoad.js}"></script>
+    <script>
+
+        const avatarInput = document.getElementById("avatar");
+        const avatarPreview = document.getElementById("avatarPreview");
+        const removeAvatarBtn = avatarPreview.nextElementSibling;
+
+        avatarInput.addEventListener("change", function ()
+        {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    avatarPreview.src = e.target.result;
+                    avatarPreview.style.display = "block";
+                    removeAvatarBtn.style.display = "inline-block";
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        function removeAvatar()
+        {
+            avatarInput.value = "";
+            avatarPreview.src = "";
+            avatarPreview.style.display = "none";
+            removeAvatarBtn.style.display = "none";
+        }
+
+
+        const imageInput = document.getElementById("imageWorkplaceFiles");
+        const previewContainer = document.getElementById("imageWorkplacePreview");
+        let storedFiles = []; // giữ tất cả ảnh đã chọn
+
+        imageInput.addEventListener("change", function ()
+        {
+            Array.from(this.files).forEach((file) => {
+                storedFiles.push(file); // thêm ảnh mới vào danh sách
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const wrapper = document.createElement("div");
+                    wrapper.classList.add("position-relative", "me-2", "mb-2", "img-wrapper");
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add("img-thumbnail");
+                    img.style.maxWidth = "120px";
+                    img.style.maxHeight = "100px";
+
+                    const btn = document.createElement("button");
+                    btn.innerHTML = "&times;";
+                    btn.classList.add("remove-btn");
+                    btn.type = "button";
+                    btn.onclick = () => {
+                        const index = Array.from(previewContainer.children).indexOf(wrapper);
+                        removeImageAtIndex(index);
+                    };
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btn);
+                    previewContainer.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            this.value = '';
+        });
+
+        function removeImageAtIndex(index)
+        {
+            storedFiles.splice(index, 1);
+
+            // Cập nhật lại input file
+            const dt = new DataTransfer();
+            storedFiles.forEach(file => dt.items.add(file));
+            imageInput.files = dt.files;
+
+            // Xóa ảnh khỏi giao diện
+            previewContainer.removeChild(previewContainer.children[index]);
+        }
+
+        document.getElementById('createCompanyForm').addEventListener('submit', function (e) {
+
+            const dt = new DataTransfer();
+            storedFiles.forEach(file => dt.items.add(file));
+            imageInput.files = dt.files;
+            console.log(dt);
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+        });
+
+    </script>
+
+</body>

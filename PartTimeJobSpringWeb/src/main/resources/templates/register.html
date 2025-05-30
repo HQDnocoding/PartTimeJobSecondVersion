@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <head>  
+        <title>Đăng ký</title>
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    <main class="container">
+        <h1 class="text-center text-info mt-1">ĐĂNG KÝ TÀI KHOẢN NHÀ TUYỂN DỤNG</h1>
+
+        <form class="mx-5" th:action="@{/register}" method="post" >
+            <div class="form-floating mb-3">
+                <input id="username" for="username" class="form-control" placeholder="Username" required><!-- comment -->
+
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input id="password" for="password" type="password" class="form-control" placeholder="Password" required ><!-- comment -->
+                <label for="password">Password</label>
+            </div>
+            
+            <div class="d-flex justify-content-center d-block">                
+                <button type="submit" class="btn btn-primary btn-lg btn-block shadow-lg mt-2 d-block">Đăng nhập</button>
+            </div>
+        </form>
+
+    </main>
+    <div th:replace="base :: footer"></div>
+
+</body>
+</html>

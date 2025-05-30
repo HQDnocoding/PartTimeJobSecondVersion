@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách công việc</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="~{base :: bootstrap}"></th:block>
+    <style>
+        .table-responsive thead {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: #fff;
+        }
+        .pagination {
+            justify-content: flex-start;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .table-section {
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .toast {
+            z-index: 1050 !important;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+    <main class="container column-gap-3 min-vh-90" style="display: flex; flex-direction: row">
+        <div style="flex-grow: 3; max-height: 90vh;" class="table-responsive">
+            <div class="d-flex flex-column h-100">
+                <div class="header-section" style="flex: 0;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+                        <h5>Danh sách công việc</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Hành động
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="actionDropdown">
+                                <li>
+                                    <a class="dropdown-item" th:onclick="'deleteRecord(event, \'' + @{/api/admin/jobs} + '\', \'.job-checkbox:checked\')'" id="deleteSelected">Xóa</a>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/jobs/create-job}">Tạo mới</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="pagination-section" style="flex: 0;">
+                    <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/jobs(page=${currentPage - 1}, keyword=${keyword}, majorId=${selectedMajorId}, salaryMin=${salaryMin}, salaryMax=${salaryMax}, city=${city}, district=${district}, fullAddress=${fullAddress}, dayId=${selectedDayId}, status=${status})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/jobs(page=${i}, keyword=${keyword}, majorId=${selectedMajorId}, salaryMin=${salaryMin}, salaryMax=${salaryMax}, city=${city}, district=${district}, fullAddress=${fullAddress}, dayId=${selectedDayId}, status=${status})}" th:text="${i}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/jobs(page=${currentPage + 1}, keyword=${keyword}, majorId=${selectedMajorId}, salaryMin=${salaryMin}, salaryMax=${salaryMax}, city=${city}, district=${district}, fullAddress=${fullAddress}, dayId=${selectedDayId}, status=${status})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="table-section">
+                    <table class="table caption-top">
+                        <thead class="position-sticky top-0 z-3">
+                            <tr>
+                                <th scope="col"><input type="checkbox" id="selectAll"></th>
+                                <th scope="col">ID</th>
+                                <th scope="col">Tên công việc</th>
+                                <th scope="col">Công ty</th>
+                                <th scope="col">Lương</th>
+                                <th scope="col">Thành phố</th>
+                                <th scope="col">Ngành nghề</th>
+                                <th scope="col">Thời gian làm việc</th>
+                                <th scope="col">Ngày đăng</th>
+                                <th scope="col">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="job : ${jobs}">
+                                <td><input type="checkbox" class="job-checkbox" th:value="${job.id}"></td>
+                                <td th:text="${job.id}"></td>
+                                <td><a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.jobName}"></a></td>
+                                <td th:text="${job.companyId.name}"></td>
+                                <td th:text="${job.salaryMin} + ' - ' + ${job.salaryMax} + ' VNĐ'"></td>
+                                <td th:text="${job.city}"></td>
+                                <td th:text="${job.majorJobCollection != null and !#lists.isEmpty(job.majorJobCollection)} ? ${#strings.listJoin(job.majorJobCollection.![majorId.name], ', ')} : '-'"></td>
+                                <td th:text="${job.dayJobCollection != null and !#lists.isEmpty(job.dayJobCollection)} ? ${#strings.listJoin(job.dayJobCollection.![dayId.name], ', ')} : '-'"></td>
+                                <td th:text="${#dates.format(job.postedDate, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                                <td class="d-flex justify-content-center">
+                                    <span class="badge" th:switch="${job.status}"
+                                          th:classappend="
+                                          ${job.status == 'approved'} ? 'bg-success' :
+                                          (${job.status == 'refused'} ? 'bg-danger' : 'bg-warning')">
+                                        <span th:case="'approved'" th:text="${job.status}"></span>
+                                        <span th:case="'refused'" th:text="${job.status}"></span>
+                                        <span th:case="*" th:text="${job.status}"></span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(jobs)}">
+                                <td colspan="10" class="text-center">Không có dữ liệu</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div style="flex-grow: 1">
+            <form th:action="@{/jobs}" method="get" class="p-3 bg-light rounded" onsubmit="removeEmptyParams(this)">
+                <h5 class="mb-3">Tìm kiếm công việc</h5>
+                <div class="mb-3">
+                    <label for="keyword" class="form-label">Từ khóa</label>
+                    <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tìm theo tên công việc hoặc mô tả">
+                </div>
+                <div class="mb-3">
+                    <label for="majorId" class="form-label">Ngành nghề</label>
+                    <select id="majorId" name="majorId" class="form-control">
+                        <option value="" th:selected="${selectedMajorId == null}">Tất cả</option>
+                        <option th:each="major : ${majors}" th:value="${major.id}" th:text="${major.name}" th:selected="${major.id == selectedMajorId}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="salaryMin" class="form-label">Lương tối thiểu</label>
+                    <input type="number" id="salaryMin" name="salaryMin" th:value="${salaryMin}" class="form-control" placeholder="VD: 8000000">
+                </div>
+                <div class="mb-3">
+                    <label for="salaryMax" class="form-label">Lương tối đa</label>
+                    <input type="number" id="salaryMax" name="salaryMax" th:value="${salaryMax}" class="form-control" placeholder="VD: 20000000">
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">Thành phố</label>
+                    <select class="form-select" id="city" name="city" required>
+                        <option value="" th:selected="${city == null}">Tất cả</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="district" class="form-label">Quận/Huyện</label>
+                    <select class="form-select" id="district" name="district" required>
+                        <option value="" th:selected="${district == null}">Tất cả</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="fullAddress" class="form-label">Địa chỉ</label>
+                    <input type="text" id="fullAddress" name="fullAddress" th:value="${fullAddress}" class="form-control" placeholder="Tìm theo địa chỉ cụ thể">
+                </div>
+                <div class="mb-3">
+                    <label for="dayId" class="form-label">Thời gian làm việc</label>
+                    <select id="dayId" name="dayId" class="form-control">
+                        <option value="" th:selected="${selectedDayId == null}">Tất cả</option>
+                        <option th:each="day : ${days}" th:value="${day.id}" th:text="${day.name}" th:selected="${day.id == selectedDayId}"></option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Trạng thái</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="" th:selected="${status == null}">Tất cả</option>
+                        <option value="pending" th:selected="${status == 'pending'}">Pending</option>
+                        <option value="approved" th:selected="${status == 'approved'}">Approved</option>
+                        <option value="refused" th:selected="${status == 'refused'}">Refused</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <a th:href="@{/jobs}" class="btn btn-secondary">Xóa bộ lọc</a>
+                </div>
+            </form>
+        </div>
+    </main>
+    <div th:replace="~{base :: footer}"></div>
+
+    <div th:if="${successMessage}" class="toast align-items-center text-white bg-success border-0 position-fixed top-0 end-0 m-3" role="alert" data-bs-autohide="true" data-bs-delay="2000">
+        <div class="d-flex">
+            <div class="toast-body" th:text="${successMessage}"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div th:if="${errorMessage}" class="toast align-items-center text-white bg-danger border-0 position-fixed top-0 end-0 m-3" role="alert" data-bs-autohide="true" data-bs-delay="2000">
+        <div class="d-flex">
+            <div class="toast-body" th:text="${errorMessage}"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <script th:src="@{/js/cityDistrictLoad.js}"></script>
+    <script>
+        function removeEmptyParams(form) {
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (!input.value || input.value === '') {
+                    input.disabled = true;
+                }
+            });
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Debug successMessage
+            console.log("Success message: ", /*[[${successMessage}]]*/ null);
+            // Kích hoạt tất cả các toast
+            document.querySelectorAll('.toast').forEach(toast => {
+                console.log("Showing toast: ", toast);
+                new bootstrap.Toast(toast).show();
+            });
+        });
+    </script>
+</body>
+</html>

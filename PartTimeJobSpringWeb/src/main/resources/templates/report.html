@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Reports</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    <main class="container my-5">
+        <h2 class="mb-4 text-center">THỐNG KÊ - BÁO CÁO</h2>
+        <!-- Hiển thị thông báo lỗi nếu có -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+        <form th:action="@{/report}" method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-5 form-group mb-3">
+                    <label for="fromDate" class="form-label">Từ ngày</label>
+                    <input type="date" name="fromDate" id="fromDate" class="form-control border border-warning" th:value="${fromDate}"/>
+                </div>
+                <div class="col-md-5 form-group mb-3">
+                    <label for="toDate" class="form-label">Đến ngày</label>
+                    <input type="date" name="toDate" id="toDate" class="form-control border border-warning" th:value="${toDate}"/>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-warning w-100">Áp dụng</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Số việc làm</th>
+                            <th>Số ứng viên</th>
+                            <th>Số nhà tuyển dụng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="report : ${reportData}">
+                            <td th:text="${#dates.format(report.date, 'yyyy-MM-dd')}"></td>
+                            <td th:text="${report.jobCount}"></td>
+                            <td th:text="${report.candidateCount}"></td>
+                            <td th:text="${report.companyCount}"></td>
+                        </tr>
+                        <tr th:if="${reportData.isEmpty()}">
+                            <td colspan="4" class="text-center">Không có dữ liệu</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <canvas id="myChart" style="max-height: 400px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Nút xuất Excel -->
+        <a th:href="@{/report/export-excel(fromDate=${fromDate},toDate=${toDate})}" class="btn btn-success mt-3">Xuất Excel</a>
+        <a th:href="@{/}" class="btn btn-secondary mt-3">Quay lại trang chủ</a>
+    </main>
+    <div th:replace="base :: footer"></div>
+    <script th:src="@{/js/report.js}"></script>
+</body>
+</html>

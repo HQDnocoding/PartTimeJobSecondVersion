@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Tạo mới công việc</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="~{base :: bootstrap}"></th:block>
+    <style>
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.9rem;
+            display: block;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .form-select {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+    <main class="container my-5">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Tạo mới công việc</h2>
+                <form th:action="@{/jobs}" method="post" th:object="${jobDTO}" class="row g-3" id="jobForm">
+                    <div class="col-12">
+                        <h4 class="border-bottom pb-2 mb-4">Thông Tin Công Việc</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="jobName" class="form-label">Tên công việc *</label>
+                        <input type="text" id="jobName" th:field="*{jobName}" class="form-control" placeholder="Nhập tên công việc" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('jobName')}" th:errors="*{jobName}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="companyId" class="form-label">Công ty *</label>
+                        <select id="companyId" th:field="*{companyId}" class="form-select" required>
+                            <option value="" disabled="disabled" selected>Chọn công ty</option>
+                            <option th:each="company : ${companies}" th:value="${company.id}" th:text="${company.name}"></option>
+                        </select>
+                        <div class="invalid-feedback" id="companyIdError" th:if="${#fields.hasErrors('companyId')}" th:errors="*{companyId}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fullAddress" class="form-label">Địa chỉ đầy đủ *</label>
+                        <input type="text" id="fullAddress" th:field="*{fullAddress}" class="form-control" placeholder="Nhập địa chỉ" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fullAddress')}" th:errors="*{fullAddress}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Tỉnh/Thành phố *</label>
+                        <select class="form-select" id="city" th:field="*{city}" required>
+                            <option value="">Chọn Tỉnh/thành phố</option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="district" class="form-label">Quận/Huyện *</label>
+                        <select class="form-select" id="district" th:field="*{district}" required>
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('district')}" th:errors="*{district}"></div>
+                    </div>
+                    <input type="hidden" id="longitude" th:field="*{longitude}" class="form-control" step="any">
+                    <input type="hidden" id="latitude" th:field="*{latitude}" class="form-control" step="any">
+                    <div class="col-12">
+                        <label class="form-label">Bản đồ vị trí</label>
+                        <div id="map"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="salaryMin" class="form-label">Lương tối thiểu (VNĐ) *</label>
+                        <input type="number" id="salaryMin" th:field="*{salaryMin}" class="form-control" placeholder="Nhập lương tối thiểu" required min="0">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('salaryMin')}" th:errors="*{salaryMin}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="salaryMax" class="form-label">Lương tối đa (VNĐ) *</label>
+                        <input type="number" id="salaryMax" th:field="*{salaryMax}" class="form-control" placeholder="Nhập lương tối đa" required min="0">
+                        <div class="invalid-feedback" id="salaryMaxError" th:if="${#fields.hasErrors('salaryMax')}" th:errors="*{salaryMax}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="majorId" class="form-label">Ngành nghề *</label>
+                        <select id="majorId" th:field="*{majorId}" class="form-select" required>
+                            <option value="" disabled="disabled" selected>Chọn ngành nghề</option>
+                            <option th:each="major : ${majors}" th:value="${major.id}" th:text="${major.name}"></option>
+                        </select>
+                        <div class="invalid-feedback" id="majorIdError" th:if="${#fields.hasErrors('majorId')}" th:errors="*{majorId}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ageFrom" class="form-label">Tuổi tối thiểu *</label>
+                        <input type="number" id="ageFrom" th:field="*{ageFrom}" class="form-control" placeholder="Nhập tuổi tối thiểu (từ 16)" required min="16">
+                        <div class="invalid-feedback" id="ageFromError" th:if="${#fields.hasErrors('ageFrom')}" th:errors="*{ageFrom}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ageTo" class="form-label">Tuổi tối đa *</label>
+                        <input type="number" id="ageTo" th:field="*{ageTo}" class="form-control" placeholder="Nhập tuổi tối đa" required min="16">
+                        <div class="invalid-feedback" id="ageToError" th:if="${#fields.hasErrors('ageTo')}" th:errors="*{ageTo}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="experienceRequired" class="form-label">Kinh nghiệm yêu cầu (năm) *</label>
+                        <input type="number" id="experienceRequired" th:field="*{experienceRequired}" class="form-control" placeholder="Nhập số năm kinh nghiệm" required min="0">
+                        <div class="invalid-feedback" id="experienceRequiredError" th:if="${#fields.hasErrors('experienceRequired')}" th:errors="*{experienceRequired}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label for="description" class="form-label">Mô tả công việc *</label>
+                        <textarea id="description" th:field="*{description}" class="form-control" rows="5" placeholder="Nhập mô tả công việc" required></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label for="jobRequired" class="form-label">Yêu cầu công việc *</label>
+                        <textarea id="jobRequired" th:field="*{jobRequired}" class="form-control" rows="5" placeholder="Nhập yêu cầu công việc" required></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('jobRequired')}" th:errors="*{jobRequired}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Thời gian làm việc *</label>
+                        <div class="checkbox-group">
+                            <div th:each="day : ${days}">
+                                <input type="checkbox" th:field="*{dayIds}" th:value="${day.id}" th:id="'dayId-' + ${day.id}">
+                                <label th:for="'dayId-' + ${day.id}" th:text="${day.name}"></label>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('dayIds')}" th:errors="*{dayIds}"></div>
+                        <div id="dayIdsError" class="invalid-feedback" style="display: none;">Vui lòng chọn ít nhất một ngày làm việc.</div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary w-100">Tạo công việc</button>
+                    </div>
+                    <div class="col-12 text-center">
+                        <a th:href="@{/jobs}" class="btn btn-secondary">Quay lại danh sách</a>
+                    </div>
+                    <div class="col-12 text-center">
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+                        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{base :: footer}"></div>
+
+    <div th:if="${successMessage}" class="toast align-items-center text-white bg-success border-0 position-fixed top-0 end-0 m-3" role="alert" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body" th:text="${successMessage}"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div th:if="${errorMessage}" class="toast align-items-center text-white bg-danger border-0 position-fixed top-0 end-0 m-3" role="alert" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body" th:text="${errorMessage}"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <!-- HereMap SDK -->
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script th:src="@{/js/cityDistrictLoad.js}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Pass selected city and district to cityDistrictLoad.js
+        window.selectedCity = /*[[${jobDTO.city}]]*/ '';
+        window.selectedDistrict = /*[[${jobDTO.district}]]*/ '';
+
+        // HereMap initialization
+        document.addEventListener('DOMContentLoaded', function () {
+            const platform = new H.service.Platform({
+                apikey: /*[[${hereMapApiKey}]]*/
+            });
+            const defaultLayers = platform.createDefaultLayers();
+            const map = new H.Map(
+                    document.getElementById('map'),
+                    defaultLayers.vector.normal.map,
+                    {
+                        zoom: 10,
+                        center: {lat: 10.7769, lng: 106.7009} // Mặc định TP.HCM
+                    }
+            );
+            const mapEvents = new H.mapevents.MapEvents(map);
+            const behavior = new H.mapevents.Behavior(mapEvents);
+            const ui = H.ui.UI.createDefault(map, defaultLayers);
+            let marker = null;
+
+            function updateCoordinates(lat, lng) {
+                document.getElementById('longitude').value = lng;
+                document.getElementById('latitude').value = lat;
+            }
+
+            // Click để đặt marker
+            map.addEventListener('tap', function (evt) {
+                const coord = map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
+                if (marker) {
+                    map.removeObject(marker);
+                }
+                marker = new H.map.Marker({lat: coord.lat, lng: coord.lng});
+                map.addObject(marker);
+                updateCoordinates(coord.lat, coord.lng);
+            });
+
+            // Tự động tìm kiếm địa chỉ
+            const fullAddressInput = document.getElementById('fullAddress');
+            const citySelect = document.getElementById('city');
+            const districtSelect = document.getElementById('district');
+
+            function geocodeAddress() {
+                const fullAddress = fullAddressInput.value.trim();
+                const city = citySelect.value.trim();
+                const district = districtSelect.value.trim();
+                if (fullAddress && city && district) {
+                    const query = `${fullAddress}, ${district}, ${city}, Vietnam`;
+                    const geocodingService = platform.getSearchService();
+                    geocodingService.geocode(
+                            {q: query},
+                            (result) => {
+                        const locations = result.items;
+                        if (locations.length > 0) {
+                            const position = locations[0].position;
+                            map.setCenter(position);
+                            if (marker) {
+                                map.removeObject(marker);
+                            }
+                            marker = new H.map.Marker(position);
+                            map.addObject(marker);
+                            updateCoordinates(position.lat, position.lng);
+                        } else {
+                            alert('Không tìm thấy địa chỉ này trên bản đồ.');
+                        }
+                    },
+                            (error) => {
+                        console.error('Geocoding error:', error);
+                        alert('Lỗi khi tìm kiếm địa chỉ.');
+                    }
+                    );
+                }
+            }
+
+            // Debounce để tránh gọi API quá nhiều
+            let debounceTimeout;
+            function debounceGeocode() {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(geocodeAddress, 500);
+            }
+
+            fullAddressInput.addEventListener('input', debounceGeocode);
+            citySelect.addEventListener('change', debounceGeocode);
+            districtSelect.addEventListener('change', debounceGeocode);
+
+            // Form validation
+            document.getElementById('jobForm').addEventListener('submit', function (e) {
+                let isValid = true;
+                const jobName = document.getElementById('jobName').value.trim();
+                if (!jobName) {
+                    isValid = false;
+                    document.getElementById('jobName').classList.add('is-invalid');
+                } else {
+                    document.getElementById('jobName').classList.remove('is-invalid');
+                }
+
+                const companyId = document.getElementById('companyId').value;
+                if (!companyId) {
+                    isValid = false;
+                    document.getElementById('companyId').classList.add('is-invalid');
+                    document.getElementById('companyIdError').textContent = 'Vui lòng chọn một công ty';
+                } else {
+                    document.getElementById('companyId').classList.remove('is-invalid');
+                }
+
+                const fullAddress = document.getElementById('fullAddress').value.trim();
+                if (!fullAddress) {
+                    isValid = false;
+                    document.getElementById('fullAddress').classList.add('is-invalid');
+                } else {
+                    document.getElementById('fullAddress').classList.remove('is-invalid');
+                }
+
+                const city = document.getElementById('city').value;
+                if (!city) {
+                    isValid = false;
+                    document.getElementById('city').classList.add('is-invalid');
+                } else {
+                    document.getElementById('city').classList.remove('is-invalid');
+                }
+
+                const district = document.getElementById('district').value;
+                if (!district) {
+                    isValid = false;
+                    document.getElementById('district').classList.add('is-invalid');
+                } else {
+                    document.getElementById('district').classList.remove('is-invalid');
+                }
+
+                const salaryMin = parseInt(document.getElementById('salaryMin').value) || 0;
+                if (salaryMin < 0) {
+                    isValid = false;
+                    document.getElementById('salaryMin').classList.add('is-invalid');
+                } else {
+                    document.getElementById('salaryMin').classList.remove('is-invalid');
+                }
+
+                const salaryMax = parseInt(document.getElementById('salaryMax').value) || 0;
+                if (salaryMax < 0 || salaryMax < salaryMin) {
+                    isValid = false;
+                    document.getElementById('salaryMax').classList.add('is-invalid');
+                    document.getElementById('salaryMaxError').textContent = 'Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu';
+                } else {
+                    document.getElementById('salaryMax').classList.remove('is-invalid');
+                }
+
+                const majorId = document.getElementById('majorId').value;
+                if (!majorId) {
+                    isValid = false;
+                    document.getElementById('majorId').classList.add('is-invalid');
+                    document.getElementById('majorIdError').textContent = 'Vui lòng chọn một ngành nghề';
+                } else {
+                    document.getElementById('majorId').classList.remove('is-invalid');
+                }
+
+                const ageFrom = parseInt(document.getElementById('ageFrom').value) || 0;
+                if (ageFrom < 16) {
+                    isValid = false;
+                    document.getElementById('ageFrom').classList.add('is-invalid');
+                    document.getElementById('ageFromError').textContent = 'Tuổi tối thiểu phải từ 16 trở lên';
+                } else {
+                    document.getElementById('ageFrom').classList.remove('is-invalid');
+                }
+
+                const ageTo = parseInt(document.getElementById('ageTo').value) || 0;
+                if (ageTo < ageFrom) {
+                    isValid = false;
+                    document.getElementById('ageTo').classList.add('is-invalid');
+                    document.getElementById('ageToError').textContent = 'Tuổi tối đa phải lớn hơn hoặc bằng tuổi tối thiểu';
+                } else {
+                    document.getElementById('ageTo').classList.remove('is-invalid');
+                }
+
+                const experienceRequired = parseInt(document.getElementById('experienceRequired').value) || -1;
+                if (experienceRequired < 0) {
+                    isValid = false;
+                    document.getElementById('experienceRequired').classList.add('is-invalid');
+                    document.getElementById('experienceRequiredError').textContent = 'Kinh nghiệm yêu cầu phải là số không âm';
+                } else {
+                    document.getElementById('experienceRequired').classList.remove('is-invalid');
+                }
+
+                const description = document.getElementById('description').value.trim();
+                if (!description) {
+                    isValid = false;
+                    document.getElementById('description').classList.add('is-invalid');
+                } else {
+                    document.getElementById('description').classList.remove('is-invalid');
+                }
+
+                const jobRequired = document.getElementById('jobRequired').value.trim();
+                if (!jobRequired) {
+                    isValid = false;
+                    document.getElementById('jobRequired').classList.add('is-invalid');
+                } else {
+                    document.getElementById('jobRequired').classList.remove('is-invalid');
+                }
+
+                const dayIds = document.querySelectorAll('input[name="dayIds"]:checked');
+                if (dayIds.length === 0) {
+                    isValid = false;
+                    document.getElementById('dayIdsError').style.display = 'block';
+                } else {
+                    document.getElementById('dayIdsError').style.display = 'none';
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Show toasts
+            document.querySelectorAll('.toast').forEach(toast => {
+                new bootstrap.Toast(toast).show();
+            });
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
