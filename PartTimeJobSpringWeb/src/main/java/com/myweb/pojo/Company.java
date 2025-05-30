@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Entity
 @Table(name = "company")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NamedQueries({
     @NamedQuery(name = "Company.findAll", query = "SELECT c FROM Company c"),
     @NamedQuery(name = "Company.findById", query = "SELECT c FROM Company c WHERE c.id = :id"),
@@ -104,8 +104,8 @@ public class Company implements Serializable {
 //    @JsonIgnore
     private Collection<ImageWorkplace> imageWorkplaceCollection;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "companyId")
-    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "companyId", fetch = FetchType.EAGER)
+//    @JsonIgnore
     @Where(clause = "is_active = true")
     private Collection<Follow> followCollection;
 

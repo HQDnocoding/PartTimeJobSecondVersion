@@ -10,6 +10,7 @@ import com.myweb.services.ApplicationService;
 import com.myweb.services.EmailService;
 import com.myweb.services.UserService;
 import com.myweb.utils.GeneralUtils;
+import jakarta.ws.rs.ForbiddenException;
 import java.security.Principal;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,31 +78,29 @@ public class ApiApplicationController {
         }
     }
 
-    @PatchMapping(path = "/secure/applications/update-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/secure/applications/update-status", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateStatusApplication(@RequestBody Application application, Principal p) {
-        System.out.println("Fff" + p.getName());
-        Application a = this.applicationService.updateStatus(application, p.getName());
-        System.out.println("jobname "+ a.getCandidateId().getUserId().getUsername()+"congy "+a.getJobId().getCompanyId().getName());
-        if (a != null) {
-            try {
-                String subject = "Chào mừng bạn đến với hệ thống tìm kiếm việc làm bán thời gian!";
-                String body = String.format(
-                        "Chào bạn"
-                        + "Hồ sơ ứng tuyển cho công việc %s tại công ty %s đã được cập nhật. Hãy truy cập hồ sơ để xem.\n",
-                        a.getJobId().getJobName(), a.getJobId().getCompanyId().getName()
-                );
-                emailService.sendEmail(a.getCandidateId().getUserId().getUsername(), subject, body);
-            } catch (DataIntegrityViolationException e) {
-                throw new IllegalArgumentException("Dữ liệu không hợp lệ, vui lòng kiểm tra lại thông tin.");
-            }
-        }
-        System.out.println(a.getId());
         try {
+            Application a = this.applicationService.updateStatus(application, p.getName());
+            if (a != null) {
+                try {
+                    String subject = "Chào mừng bạn đến với hệ thống tìm kiếm việc làm bán thời gian!";
+                    String body = String.format(
+                            "Chào bạn"
+                            + "Hồ sơ ứng tuyển cho công việc %s tại công ty %s đã được cập nhật. Hãy truy cập hồ sơ để xem.\n",
+                            a.getJobId().getJobName(), a.getJobId().getCompanyId().getName()
+                    );
+                    emailService.sendEmail(a.getCandidateId().getUserId().getUsername(), subject, body);
+                } catch (DataIntegrityViolationException e) {
+                    throw new IllegalArgumentException("Dữ liệu không hợp lệ, vui lòng kiểm tra lại thông tin.");
+                }
+            }
             if (a != null) {
                 return new ResponseEntity<>(Map.of("message", "Cập nhật trạng thái đơn ứng tuyển thành công", "data", a), HttpStatus.OK);
-            } else {
             }
             return new ResponseEntity<>(Map.of("message", "Cập nhật trạng thái đơn ứng không thành công", "data", a), HttpStatus.FORBIDDEN);
+        } catch (IllegalArgumentException i) {
+            return new ResponseEntity<>(Map.of("message", "Đã được cập nhật không thể thay đổi"), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             return new ResponseEntity<>(Map.of("message", "Cập nhật trạng thái đơn ứng tuyển thất bại" + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -119,6 +118,5 @@ public class ApiApplicationController {
             return new ResponseEntity<>(Map.of("message", "Lấy thông tin thất bại " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
 
 }

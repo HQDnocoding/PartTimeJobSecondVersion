@@ -254,5 +254,29 @@ public class CandidateRepositoryImplement implements CandidateRepository {
             return null;
         }
     }
+    
+        @Override
+    public User getUser(int id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Candidate> cq = cb.createQuery(Candidate.class);
+        Root<Candidate> candidateRoot = cq.from(Candidate.class);
+
+        Join<Candidate, User> userJoin = candidateRoot.join("userId");
+        List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(cb.equal(candidateRoot.get("id"), id));
+        predicates.add(cb.equal(userJoin.get("isActive"), true));
+        cq.where(predicates.toArray(Predicate[]::new));
+
+        try {
+            Candidate candidate = session.createQuery(cq).getSingleResult();
+            return candidate.getUserId();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 }

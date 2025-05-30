@@ -104,4 +104,17 @@ public class ApiCandidateController {
         }
     }
 
+    @GetMapping("/secure/candidates/{candidateId}/id-role")
+    public ResponseEntity<?> getUserIdAndRole(@PathVariable(value = "candidateId") int companyId) {
+        try {
+            Map<String, Object> map = this.candidateService.getUserIdAndRole(companyId);
+            if (map.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+            return ResponseEntity.ok(map);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching company: " + e.getMessage());
+        }
+    }
+
 }

@@ -66,10 +66,8 @@ public class ApiUserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User u) {
         try {
-            System.out.println(String.format("username %s pw %s", u.getUsername(), u.getClientPassword()));
             // Xác thực người dùng
             User user = userService.authenticate(u.getUsername(), u.getClientPassword());
-
             String token = JwtUtils.generateToken(user.getUsername(), List.of(user.getRole()));
 
             return ResponseEntity.ok().body(Collections.singletonMap("token", token));
@@ -88,7 +86,7 @@ public class ApiUserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error",  e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -96,17 +94,24 @@ public class ApiUserController {
     @ResponseBody
     @CrossOrigin
     public ResponseEntity<?> getProfile(Principal principal) {
-        User user = this.userService.getUserByUsername(principal.getName());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        try {
+            User user = this.userService.getUserByUsername(principal.getName());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            MappingJacksonValue mapping = new MappingJacksonValue(user);
+            FilterProvider filters = new SimpleFilterProvider().addFilter("UserFilter", USER_FILTER);
+            mapping.setFilters(filters);
+
+            System.out.println("User fetched: " + user);
+            return ResponseEntity.ok(mapping);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Lỗi hệ thống: " + e.getMessage()));
         }
 
-        MappingJacksonValue mapping = new MappingJacksonValue(user);
-        FilterProvider filters = new SimpleFilterProvider().addFilter("UserFilter", USER_FILTER);
-        mapping.setFilters(filters);
-
-        System.out.println("User fetched: " + user);
-        return ResponseEntity.ok(mapping);
     }
 
     @PostMapping("/google-login")

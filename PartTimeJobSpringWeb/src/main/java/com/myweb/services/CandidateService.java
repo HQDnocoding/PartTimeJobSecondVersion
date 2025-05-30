@@ -31,13 +31,16 @@ public interface CandidateService {
 
     // Lấy danh sách tất cả ứng viên
     List<Candidate> getCandidateList();
-    
+
     // Xóa ứng viên theo ID
     void deleteCandidate(int id);
-    
+
     Candidate getCandidateByUserId(int userId);
-    
-    User createCandidateByGoogleAccount(Map<String,String> params);
-    
-    Candidate updateCadidate(Candidate candidate, Principal principal,int id);
+
+    User createCandidateByGoogleAccount(Map<String, String> params);
+
+    Candidate updateCadidate(Candidate candidate, Principal principal, int id);
+
+    Map<String, Object> getUserIdAndRole(int id);
+
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 public interface CandidateRepository {
 
     Candidate addOrUpdateCandidate(Candidate c);
-    
+
     Map<String, Object> getListCandidate(Map<String, String> params);
 
     Candidate getCandidateById(int candidateId);
@@ -32,7 +32,9 @@ public interface CandidateRepository {
     void deleteCandidate(int id);
 
     Candidate getCandidateByUserId(int userId);
-    
+
     Candidate updateCandidate(Candidate can);
+
+    User getUser(int id);
 
 }

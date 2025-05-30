@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import static com.myweb.utils.ValidationUtils.isValidPassword;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import org.springframework.context.annotation.Primary;
@@ -275,5 +276,14 @@ public class CandidateServiceImplement implements CandidateService {
             return null;
         }
 
+    }
+
+    @Override
+    public Map<String, Object> getUserIdAndRole(int id) {
+        User user = this.candidateRepository.getUser(id); 
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
+        map.put("role", user.getRole());
+        return map;
     }
 }

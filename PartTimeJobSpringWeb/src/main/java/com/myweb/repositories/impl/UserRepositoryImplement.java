@@ -72,9 +72,6 @@ public class UserRepositoryImplement implements UserRepository {
         if (u == null) {
             return null;
         }
-        System.out.println("client" + password);
-        System.out.println("pw" + u.getPassword());
-
         if (this.passwordEncoder.matches(password, u.getPassword())) {
             return u;
         } else {

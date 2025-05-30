@@ -115,13 +115,18 @@ public class ApplicationServiceImplement implements ApplicationService {
         System.out.println("ussernam" + username);
         try {
             User user = this.userRepo.getUserByUsername(username);
-//            System.out.println(String.format("companyId %s, appcom %s, %s", user.getCompany().getId(), application.getJobId().getCompanyId().getId(), application.getStatus()));
             Application updateApplication = this.applicationRepository.getApplicationById(application.getId());
+            if (updateApplication.getStatus().equals(GeneralUtils.Status.approved.toString()) || updateApplication.getStatus().equals(GeneralUtils.Status.refused.toString())) {
+                throw new IllegalArgumentException();
+            }
             if (Objects.equals(user.getCompany().getId(), updateApplication.getJobId().getCompanyId().getId())) {
                 updateApplication.setStatus(application.getStatus());
                 return this.applicationRepository.addOrUpdateApplication(updateApplication);
             }
+
             return null;
+        } catch (IllegalArgumentException i) {
+            throw new IllegalArgumentException();
         } catch (Exception e) {
             return null;
         }

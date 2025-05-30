@@ -106,7 +106,7 @@ public class ApiCompanyController {
         }
     }
 
-    @GetMapping("/companies/{companyId}/id-role")
+    @GetMapping("/secure/companies/{companyId}/id-role")
     public ResponseEntity<?> getUserIdAndRole(@PathVariable(value = "companyId") int companyId) {
         try {
             Map<String, Object> map = this.cpnyService.getUserIdAndRole(companyId);

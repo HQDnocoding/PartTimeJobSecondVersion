@@ -37,7 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Entity
 @Table(name = "candidate")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @NamedQueries({
     @NamedQuery(name = "Candidate.findAll", query = "SELECT c FROM Candidate c"),
     @NamedQuery(name = "Candidate.findById", query = "SELECT c FROM Candidate c WHERE c.id = :id"),

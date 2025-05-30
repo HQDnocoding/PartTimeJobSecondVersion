@@ -101,8 +101,7 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
         if (totalPages < page || page <= 0) {
             page = 1;
         }
-
-        // Tạo kết quả trả về
+        
         Map<String, Object> result = new HashMap<>();
         result.put("applications", results);
         result.put("currentPage", page);
@@ -124,17 +123,14 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
             predicates.add(cb.equal(root.get("candidateId").get("id"), user.getCandidate().getId()));
         }
 
-        // Chỉ lấy đơn ứng tuyển của công việc active
         predicates.add(cb.equal(root.get("jobId").get("isActive"), true));
 
         if (params != null) {
-            // Trạng thái
             String status = params.get("status");
             if (status != null && !status.isEmpty()) {
                 predicates.add(cb.equal(root.get("status"), status));
             }
 
-            // Từ khóa (tìm trong jobName hoặc description của Job)
             String keyword = params.get("keyword");
             if (keyword != null && !keyword.isEmpty()) {
                 predicates.add(cb.or(
@@ -143,19 +139,16 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
                 ));
             }
 
-            // Tên ứng viên
             String candidateName = params.get("candidateName");
             if (candidateName != null && !candidateName.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("candidateId").get("fullName")), "%" + candidateName.toLowerCase() + "%"));
             }
 
-            // Tên công việc
             String jobName = params.get("jobName");
             if (jobName != null && !jobName.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("jobId").get("jobName")), "%" + jobName.toLowerCase() + "%"));
             }
 
-            // Job ID
             String jobIdStr = params.get("jobId");
             if (jobIdStr != null && !jobIdStr.isEmpty()) {
                 try {
@@ -166,7 +159,6 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
                 }
             }
 
-            // Thành phố
             String city = params.get("city");
             if (city != null && !city.isEmpty()) {
                 String normalizedCity = normalizeLocation(city);
@@ -175,7 +167,6 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
                 }
             }
 
-            // Quận/Huyện
             String district = params.get("district");
             if (district != null && !district.isEmpty()) {
                 String normalizedDistrict = normalizeLocation(district);
