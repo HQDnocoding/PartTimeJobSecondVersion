@@ -27,7 +27,8 @@ export const endpoints = {
     'getApplicationDetail': (id) => `/secure/applications/${id}`,
     'getDetailCompany': (id) => `/companies/${id}`,
     'getJobsForCompany': (id) => `/companies/${id}/jobs`,
-    'getUserIdFromCompanyId': (id) => `/companies/${id}/id-role`,
+    'getUserIdFromCompanyId': (id) => `/secure/companies/${id}/id-role`,
+    'getUserIdFromCandidateId': (id) => `/secure/candidates/${id}/id-role`,
     'getCompanyByUserId': (id) => `/secure/companies/${id}/infor-by-userId`,
     'getCandidateByUserId': (id) => `/secure/candidates/${id}/infor-by-userId`,
     'jobs': '/jobs',
@@ -41,7 +42,7 @@ export const endpoints = {
     'followCompany': (id) => `/secure/follow/${id}`,
     'unfollowCompany': (id) => `/secure/unfollow/${id}`,
     'isFollowing': (id) => `/secure/is-following/${id}`,
-    'followedCompanies': '/secure/followed-companies', 
+    'followedCompanies': '/secure/followed-companies',
     'followers': (id) => `/followers/${id}`,
 };
 

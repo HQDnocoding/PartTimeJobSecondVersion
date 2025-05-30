@@ -5,17 +5,21 @@ import ChatDropdown from './ChatDropdown';
 import { memo, useContext, useEffect, useState } from 'react';
 import rolesAndStatus from '../../utils/rolesAndStatus';
 import { MyChatBoxContext, MyDispatchContext, MyUserContext } from '../../configs/Contexts';
+import cookie from 'react-cookies';
+
 
 const Header = () => {
     const user = useContext(MyUserContext);
     const dispatch = useContext(MyDispatchContext);
-    const { setIsOpen } = useContext(MyChatBoxContext); 
+    const { setIsOpen } = useContext(MyChatBoxContext);
 
     const [showDropdown, setShowDropdown] = useState(false); // Trạng thái để toggle dropdown
 
     const handleLogout = () => {
         dispatch({ type: "logout" });
+        // cookie.remove('token');
         setIsOpen(false);
+        // window.localStorage.clear();
     };
 
     useEffect(() => {
@@ -112,7 +116,7 @@ const Header = () => {
                                             0
                                         </span>
                                     </Button>
-                                    {showDropdown && ( 
+                                    {showDropdown && (
                                         <div
                                             className="notification-dropdown shadow rounded bg-white position-absolute"
                                             style={{ right: 0, zIndex: 1000, width: 300 }}

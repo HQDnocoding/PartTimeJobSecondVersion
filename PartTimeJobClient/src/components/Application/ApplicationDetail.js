@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Spinner, Badge, Row, Col, Alert, Table } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { MyChatBoxContext, MyReceiverContext, MyUserContext } from '../../configs/Contexts';
 import APIs, { authApis, endpoints } from '../../configs/APIs';
 import './applicationDetail.scss';
 import { states } from '../../utils/rolesAndStatus';
 import { formatDate, formatSalary } from '../../utils/CommonUtils';
+import { MyChatBoxContext, MyReceiverContext, MyUserContext } from '../../configs/Contexts';
 
 const ApplicationDetail = () => {
     const { id } = useParams();
@@ -21,11 +21,10 @@ const ApplicationDetail = () => {
 
     const handleMessage = async () => {
         try {
-            const res = await APIs.get(endpoints.getUserIdFromCandidateId(application?.candidateId?.id));
+            const res = await authApis().get(endpoints['getUserIdFromCandidateId'](application?.candidateId?.id));
             if (res.status === 200) {
                 setReceiver(res.data);
                 setIsOpen(true);
-                toast.success('Mở khung chat thành công!');
             }
         } catch (e) {
             console.error('Lỗi khi mở chat:', e);
@@ -131,8 +130,11 @@ const ApplicationDetail = () => {
 
     return (
         <Container className="application-detail-container py-5">
+
             <h2 className="mb-4 text-center">Thông tin đơn ứng tuyển</h2>
+
             <Row>
+
                 {/* Cột CV */}
                 <Col lg={6} className="mb-4">
                     <Card className="cv-card">
@@ -156,9 +158,13 @@ const ApplicationDetail = () => {
                 </Col>
 
                 {/* Cột thông tin cơ bản */}
+
                 <Col lg={6}>
+
                     <Card className="info-card">
+
                         <Card.Body>
+
                             <h5>Thông tin ứng viên</h5>
                             <Table borderless hover size="sm">
                                 <tbody>
@@ -247,10 +253,21 @@ const ApplicationDetail = () => {
                                 </div>
                             )}
                         </Card.Body>
-                        <Card.Footer className="text-center">
-                            <Button variant="primary" onClick={handleBack}>
-                                Quay lại
-                            </Button>
+                        <Card.Footer className=" text-center">
+                            <div className="action-buttons mt-4 text-center">
+
+                                <Button variant="primary" className="me-2" onClick={handleBack}>
+                                    Quay lại
+                                </Button>
+                                <Button
+                                    className="me-2"
+                                    variant="primary"
+                                    onClick={handleMessage}
+                                >
+                                    Nhắn tin
+                                </Button>
+                            </div>
+
                         </Card.Footer>
                     </Card>
                 </Col>

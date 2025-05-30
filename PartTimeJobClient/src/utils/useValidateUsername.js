@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { MyUserContext } from '../configs/Contexts';
 
 const useValidateUsername = () => {
     const [error, setError] = useState('');
@@ -19,4 +21,17 @@ const useValidateUsername = () => {
 };
 
 export default useValidateUsername;
+
+
+export const useRoleGuard = (allowedRoles) => {
+    const user = useContext(MyUserContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!user || !allowedRoles.includes(user.role)) {
+            navigate('/', { replace: true });
+        }
+    }, [user, allowedRoles, navigate]);
+};
+
 

@@ -5,11 +5,14 @@ import { toast } from 'react-toastify';
 import './applicationList.scss';
 import ApplicationFilter from './ApplicationFilter';
 import APIs, { authApis, endpoints } from '../../configs/APIs';
-import { MyUserContext } from '../../configs/Contexts';
+import { MyChatBoxContext, MyReceiverContext, MyUserContext } from '../../configs/Contexts';
 import { states } from '../../utils/rolesAndStatus';
 import { formatDate } from '../../utils/CommonUtils';
 
+
 const ApplicationList = () => {
+    const { isOpen, setIsOpen } = useContext(MyChatBoxContext);
+    const { receiver, setReceiver } = useContext(MyReceiverContext);
     const user = useContext(MyUserContext);
     const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
@@ -29,8 +32,23 @@ const ApplicationList = () => {
     });
 
     useEffect(() => {
-        console.log("application list: ", jobs);
-    }, [jobs]);
+        console.log(applications);
+
+    }, [applications])
+
+    const handleMessage = async (application) => {
+        try {
+            const res = await authApis().get(endpoints['getUserIdFromCandidateId'](application?.candidateId?.id));
+            if (res.status === 200) {
+                setReceiver(res.data);
+                setIsOpen(true);
+            }
+        } catch (e) {
+            console.error('Lỗi khi mở chat:', e);
+            toast.error('Không thể mở khung chat!');
+        }
+    };
+
 
     useEffect(() => {
         const loadData = async () => {
@@ -218,6 +236,18 @@ const ApplicationList = () => {
                                                 </Button>
                                             </>
                                         )}
+                                        <Button
+                                         variant="warning"
+                                            size="sm"
+                                            style={{marginLeft:5}}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+
+                                                handleMessage(app);
+                                            }}
+                                        >
+                                            Nhắn tin
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}

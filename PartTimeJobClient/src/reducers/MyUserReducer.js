@@ -8,7 +8,8 @@ const MyUserReducer = (current, action) => {
         case 'update_user':
             return action.payload;
         case "logout":
-            cookie.remove("token");
+            cookie.remove('token', { path: '/' });
+            cookie.remove("user", { path: '/' });
             return null;
     }
 

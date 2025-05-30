@@ -45,10 +45,10 @@ const Login = () => {
                 clientPassword: user.password,
             });
 
-            cookie.save('token', res.data.token);
+            cookie.save('token', res.data.token, { maxAge: 86400 });
 
             const userData = await authApis().get(endpoints['infor']);
-            cookie.save('user', userData.data);
+            cookie.save('user', userData.data, { maxAge: 86400 });
 
             console.log("User Info:", userData.data);
 
@@ -67,7 +67,7 @@ const Login = () => {
         } catch (ex) {
             if (ex.response) {
                 console.log(ex.response);
-                
+
                 const status = ex.response.status;
                 const errorMessage = ex.response.data?.error || 'Đăng nhập thất bại. Vui lòng thử lại.';
                 if (status !== 200) {

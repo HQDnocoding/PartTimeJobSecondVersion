@@ -176,7 +176,7 @@ const DetailCompany = () => {
 
   const handleMessage = async () => {
     try {
-      const res = await APIs.get(endpoints.getUserIdFromCompanyId(id));
+      const res = await authApis().get(endpoints.getUserIdFromCompanyId(id));
       if (res.status === 200) {
         setReceiver(res.data);
         setIsOpen(true);
