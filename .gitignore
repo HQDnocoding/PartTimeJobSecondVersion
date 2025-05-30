@@ -45,3 +45,7 @@ mail.properties
 /target/
 target
 /target
+/src/main/resources/.env
+/src/main/resources/mail.properties
+/src/main/resources/application.properties
+/src/main/resources/somethings.properties
