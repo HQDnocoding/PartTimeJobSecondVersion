@@ -116,6 +116,9 @@ const ApplicationList = () => {
 
     // Update application status
     const updateStatus = async (applicationId, newStatus) => {
+        if (!window.confirm("Bạn có lựa chọn chắc chưa?")) {
+            return;
+        }
         setLoading(true);
         try {
             const res = await authApis().patch(endpoints['updateStatusApplication'],
@@ -237,9 +240,9 @@ const ApplicationList = () => {
                                             </>
                                         )}
                                         <Button
-                                         variant="warning"
+                                            variant="warning"
                                             size="sm"
-                                            style={{marginLeft:5}}
+                                            style={{ marginLeft: 5 }}
                                             onClick={(e) => {
                                                 e.stopPropagation();
 

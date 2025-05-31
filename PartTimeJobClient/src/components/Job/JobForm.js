@@ -130,7 +130,6 @@ const JobForm = () => {
 
     // Xử lý chọn địa chỉ
     const handleAddressSelect = useCallback((addressData) => {
-        console.log('Dữ liệu địa chỉ:', addressData);
         setInputValues((prev) => ({
             ...prev,
             fullAddress: addressData.address || '',
@@ -170,7 +169,6 @@ const JobForm = () => {
                     experienceRequired: parseInt(inputValues.experienceRequired),
                 };
 
-                console.log('Dữ liệu gửi:', jobData);
 
                 const formData = new FormData();
                 Object.entries(jobData).forEach(([key, value]) => {
@@ -210,7 +208,7 @@ const JobForm = () => {
                     <Spinner animation="border" />
                 </div>
             )}
-            {errors.length > 0 && (
+            {/* {errors.length > 0 && (
                 <Card className="mb-3 border-danger">
                     <Card.Body ref={errorRef}>
                         {errors.map((error, index) => (
@@ -220,7 +218,7 @@ const JobForm = () => {
                         ))}
                     </Card.Body>
                 </Card>
-            )}
+            )} */}
             <JobInfoForm
                 inputValues={inputValues}
                 majors={majors}

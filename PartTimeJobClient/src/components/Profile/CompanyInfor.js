@@ -1,15 +1,104 @@
-import React, { useContext } from 'react';
-import { Card, Row, Col, Image, Badge, Button, Carousel } from 'react-bootstrap';
+import React, { useContext, useState } from 'react';
+import { Card, Row, Col, Image, Button, Carousel, Form, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { MyUserContext } from '../../configs/Contexts';
+import { MyDispatchContext, MyUserContext } from '../../configs/Contexts';
+import AuthenticationStatus from './AuthenticationStatus';
+import AddAuthenticationModal from './AddAuthenticationModal';
 import './profile.scss';
+import { authApis, endpoints } from '../../configs/APIs';
 
 const CompanyInfo = () => {
-  const  user  = useContext(MyUserContext);
+  const user = useContext(MyUserContext);
   const navigate = useNavigate();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState({
+    paperFile: null,
+    idCardFrontFile: null,
+    idCardBackFile: null
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const dispatch = useContext(MyDispatchContext);
 
   const handleViewJobs = () => {
     navigate('/company/profile/job-list');
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setFormData({ ...formData, [name]: files[0] });
+  };
+
+  const handleUpdate = async () => {
+    if (!user.company.companyAuthentication) {
+      setError('Không có thông tin chứng thực để cập nhật');
+      return;
+    }
+
+    const data = new FormData();
+    if (formData.paperFile) data.append('paperFile', formData.paperFile);
+    if (formData.idCardFrontFile) data.append('idCardFrontFile', formData.idCardFrontFile);
+    if (formData.idCardBackFile) data.append('idCardBackFile', formData.idCardBackFile);
+
+    if (!formData.paperFile && !formData.idCardFrontFile && !formData.idCardBackFile) {
+      setError('Vui lòng chọn ít nhất một file để cập nhật');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      await authApis().put(
+        endpoints['updateCompanyAuthentication'](user.company.companyAuthentication.id),
+        data
+      );
+      setSuccess('Cập nhật thông tin chứng thực thành công! Vui lòng tải lại trang để cập nhật.');
+
+      setFormData({ paperFile: null, idCardFrontFile: null, idCardBackFile: null });
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      // setError(err.response?.data?.error || 'Lỗi khi cập nhật thông tin chứng thực');
+    } finally {
+      setLoading(false);
+      await authApis().get(endpoints['infor']).then(res => { dispatch({ type: 'update_user', payload: res.data }) }).catch(err => {
+        dispatch({ type: 'logout' });
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!user.company.companyAuthentication) {
+      setError('Không có thông tin chứng thực để xóa');
+      return;
+    }
+
+    if (!window.confirm('Bạn có chắc muốn xóa thông tin chứng thực này?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await authApis().delete(
+        endpoints['deleteCompanyAuthentication'](user.company.companyAuthentication.id)
+      );
+      setSuccess('Xóa thông tin chứng thực thành công! Vui lòng tải lại trang để cập nhật.');
+      setFormData({ paperFile: null, idCardFrontFile: null, idCardBackFile: null });
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Lỗi khi xóa thông tin chứng thực');
+    } finally {
+      setLoading(false);
+      await authApis().get(endpoints['infor']).then(res => { dispatch({ type: 'update_user', payload: res.data }) }).catch(err => {
+        dispatch({ type: 'logout' });
+      });
+    }
+  };
+
+  const handleAddSuccess = () => {
+    setSuccess('Thêm thông tin chứng thực thành công! Vui lòng tải lại trang để cập nhật.');
+    setTimeout(() => setSuccess(null), 3000);
   };
 
   return (
@@ -32,6 +121,15 @@ const CompanyInfo = () => {
             >
               Bài đăng tuyển
             </Button>
+            {!user?.company?.companyAuthentication && (
+              <Button
+                variant="success"
+                className="mt-2"
+                onClick={() => setShowAddModal(true)}
+              >
+                Thêm thông tin chứng thực
+              </Button>
+            )}
           </Col>
 
           <Col md={8} className="profile-details-section">
@@ -64,7 +162,7 @@ const CompanyInfo = () => {
                       {user.company.imageWorkplaceCollection.map((img, index) => (
                         <Carousel.Item key={index}>
                           <Image
-                          style={{objectFit:'contain'}}
+                            style={{ objectFit: 'contain' }}
                             src={img?.imageUrl}
                             alt={`Workplace image ${index + 1}`}
                             className="workplace-image"
@@ -78,10 +176,74 @@ const CompanyInfo = () => {
                   )}
                 </Col>
               </Row>
+              <AuthenticationStatus />
+              {user?.company?.companyAuthentication && (
+                <>
+                  {error && <Alert variant="danger">{error}</Alert>}
+                  {success && <Alert variant="success">{success}</Alert>}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cập nhật giấy phép kinh doanh</Form.Label>
+                    <br />
+                    <a href={user?.company?.companyAuthentication.paper} target='_blank'>Giấy tờ</a>
+                    <Form.Control
+                      type="file"
+                      name="paperFile"
+                      accept=".pdf"
+                      onChange={handleFileChange}
+                      disabled={loading}
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+
+                    <Form.Label>Cập nhật mặt trước CMND/CCCD</Form.Label>
+                    <br />
+                    <a href={user?.company?.companyAuthentication.idCardFront} target='_blank'>CCCD mặt trước</a>
+                    <Form.Control
+                      type="file"
+                      name="idCardFrontFile"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      disabled={loading}
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cập nhật mặt sau CMND/CCCD</Form.Label>
+                    <br />
+                    <a href={user?.company?.companyAuthentication.idCardBack} target='_blank'>CCCD mặt sau</a>
+                    <Form.Control
+                      type="file"
+                      name="idCardBackFile"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      disabled={loading}
+                    />
+                  </Form.Group>
+                  <Button
+                    variant="primary"
+                    onClick={handleUpdate}
+                    disabled={loading || (!formData.paperFile && !formData.idCardFrontFile && !formData.idCardBackFile)}
+                  >
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Cập nhật'}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    className="ms-2"
+                    onClick={handleDelete}
+                    disabled={loading}
+                  >
+                    Xóa chứng thực
+                  </Button>
+                </>
+              )}
             </Card.Body>
           </Col>
         </Row>
       </Card>
+      <AddAuthenticationModal
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        onSuccess={handleAddSuccess}
+      />
     </div>
   );
 };

@@ -17,9 +17,7 @@ const Header = () => {
 
     const handleLogout = () => {
         dispatch({ type: "logout" });
-        // cookie.remove('token');
         setIsOpen(false);
-        // window.localStorage.clear();
     };
 
     useEffect(() => {

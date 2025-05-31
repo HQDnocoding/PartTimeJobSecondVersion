@@ -142,6 +142,7 @@ const ApplicationDetail = () => {
                             <h5 className="mb-0">Curriculum Vitae</h5>
                         </Card.Header>
                         <Card.Body>
+                            <a href={application.curriculumVitae}  target="_blank">Xem tab khác</a>
                             {application.curriculumVitae ? (
                                 <iframe
                                     src={application.curriculumVitae}

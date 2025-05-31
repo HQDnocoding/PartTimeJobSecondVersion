@@ -51,6 +51,7 @@ const JobInfoForm = ({ inputValues, majors, days, errors, loading, onChange, onD
               <Form.Check
                 key={day.id}
                 type="checkbox"
+                style={{display:'flex'}}
                 label={day.name}
                 value={day.id}
                 checked={inputValues.dayIds.includes(day.id)}

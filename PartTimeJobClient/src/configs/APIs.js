@@ -44,6 +44,9 @@ export const endpoints = {
     'isFollowing': (id) => `/secure/is-following/${id}`,
     'followedCompanies': '/secure/followed-companies',
     'followers': (id) => `/followers/${id}`,
+    'addCompanyAuthentication': '/secure/company-authentication',
+    'updateCompanyAuthentication': (id) => `/secure/company-authentication/${id}`,
+    'deleteCompanyAuthentication': (id) => `/secure/company-authentication/${id}`,
 };
 
 export const authApis = () => {

@@ -50,7 +50,6 @@ const App = () => {
     const token = cookie.load("token");
     if (token) {
       authApis().get(endpoints['infor']).then(res => { dispatch({ type: 'update_user', payload: res.data }) }).catch(err => {
-
         dispatch({ type: 'logout' });
       });
     } else {

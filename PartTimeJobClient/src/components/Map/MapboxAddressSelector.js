@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Form, ListGroup, Row, Col } from 'react-bootstrap';
 import debounce from 'lodash.debounce';
 import useLocationData from '../Authenticate/useLocationData';
+
 const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
     const mapContainer = useRef(null);
     const map = useRef(null);
@@ -18,6 +19,16 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
     const HERE_API_KEY = process.env.REACT_APP_HERE_API_KEY;
     const { provinces, districts, isProvinceLoading, isDistrictLoading, errors: locationErrors } = useLocationData(selectedCity);
 
+    const debouncedFetchSuggestions = useRef(
+        debounce((query, coords) => fetchSuggestions(query, coords), 400)
+    ).current;
+
+    useEffect(() => {
+        return () => {
+            debouncedFetchSuggestions.cancel(); // Hủy debounce khi component unmount
+        };
+    }, []);
+
     // Xử lý lỗi từ useLocationData
     useEffect(() => {
         if (locationErrors.length > 0) {
@@ -25,7 +36,7 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
         }
     }, [locationErrors]);
 
-    // Callback để truyền dữ liệu địa chỉ
+    //truyền dữ liệu địa chỉ
     useEffect(() => {
         if (selectedCity || selectedDistrict || address) {
             onAddressSelect({
@@ -88,7 +99,7 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
         }
     };
 
-    // Khởi tạo bản đồ
+    // Khởi tạo bản đồ và thêm sự kiện click
     useEffect(() => {
         if (!isMapLoaded || !window.H || !HERE_API_KEY || error || !mapContainer.current) {
             return;
@@ -106,12 +117,37 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
                 {
                     center: { lng: coordinates[0], lat: coordinates[1] },
                     zoom: 14,
-                    pixelRatio: 1,
+                    pixelRatio: window.devicePixelRatio || 1,
                 }
             );
 
             marker.current = new window.H.map.Marker({ lng: coordinates[0], lat: coordinates[1] });
             map.current.addObject(marker.current);
+
+            // Thêm sự kiện click vào bản đồ
+            const behavior = new window.H.mapevents.Behavior(new window.H.mapevents.MapEvents(map.current));
+            map.current.addEventListener('tap', async (evt) => {
+                const coord = map.current.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
+                setCoordinates([coord.lng, coord.lat]);
+                marker.current.setGeometry({ lng: coord.lng, lat: coord.lat });
+                map.current.setCenter({ lng: coord.lng, lat: coord.lat });
+                map.current.setZoom(16);
+
+                // Lấy địa chỉ từ tọa độ (reverse geocoding)
+                try {
+                    const response = await fetch(
+                        `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${coord.lat},${coord.lng}&lang=vi&apiKey=${encodeURIComponent(HERE_API_KEY)}`
+                    );
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi lấy địa chỉ từ tọa độ');
+                    }
+                    const data = await response.json();
+                    const addressLabel = data.items[0]?.address?.label || 'Không tìm thấy địa chỉ';
+                    setAddress(addressLabel);
+                } catch (err) {
+                    setError(`Lỗi khi lấy địa chỉ: ${err.message}`);
+                }
+            });
 
             window.addEventListener('resize', resize);
 
@@ -126,9 +162,9 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
         }
     }, [isMapLoaded, HERE_API_KEY, error]);
 
-    // Cập nhật marker
+    // Cập nhật marker khi tọa độ thay đổi
     useEffect(() => {
-        if (!map.current) return;
+        if (!map.current || !marker.current) return;
 
         marker.current.setGeometry({ lng: coordinates[0], lat: coordinates[1] });
         map.current.setCenter({ lng: coordinates[0], lat: coordinates[1] });
@@ -136,15 +172,16 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
     }, [coordinates]);
 
     // Tìm kiếm gợi ý địa chỉ
-    const fetchSuggestions = async (query) => {
+    const fetchSuggestions = async (query, coords) => {
         if (!query || query.length < 3) {
             setSuggestions([]);
             return;
         }
 
         try {
+            console.log('Tọa độ gửi API:', coords); 
             const response = await fetch(
-                `https://autosuggest.search.hereapi.com/v1/autosuggest?at=${coordinates[1]},${coordinates[0]}&q=${encodeURIComponent(query)}&in=countryCode:VNM&limit=10&resultType=address,place&lang=vi&apiKey=${encodeURIComponent(HERE_API_KEY)}`
+                `https://autosuggest.search.hereapi.com/v1/autosuggest?at=${coords[1]},${coords[0]}&q=${encodeURIComponent(query)}&in=countryCode:VNM&limit=10&resultType=address,place&lang=vi&apiKey=${encodeURIComponent(HERE_API_KEY)}`
             );
             if (!response.ok) {
                 const errorData = await response.json();
@@ -153,7 +190,8 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
 
             const data = await response.json();
             const validSuggestions = (data.items || []).filter(
-                (item) => (item.address && item.address.label) || item.title);
+                (item) => (item.address && item.address.label) || item.title
+            );
             setSuggestions(validSuggestions);
         } catch (error) {
             console.error('Lỗi khi lấy gợi ý:', error);
@@ -161,14 +199,14 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
         }
     };
 
-    const debouncedFetchSuggestions = useRef(
-        debounce((query) => fetchSuggestions(query), 400)
-    ).current;
-
     const handleAddressChange = (e) => {
         const query = e.target.value;
         setAddress(query);
-        debouncedFetchSuggestions(query);
+        if (query && query.length >= 3) {
+            debouncedFetchSuggestions(query, coordinates); // Truyền coordinates hiện tại
+        } else {
+            setSuggestions([]);
+        }
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -199,16 +237,39 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
     const handleCityChange = (e) => {
         const city = e.target.value;
         setSelectedCity(city);
-        setSelectedDistrict(''); // Reset huyện khi đổi tỉnh
+        setSelectedDistrict(''); 
     };
 
-    // Xử lý chọn huyện
-    const handleDistrictChange = (e) => {
-        setSelectedDistrict(e.target.value);
+    // Xử lý chọn huyện và lấy tọa độ
+    const handleDistrictChange = async (e) => {
+        const district = e.target.value;
+        setSelectedDistrict(district);
+
+        if (district && selectedCity) {
+            try {
+                const query = `${district}, ${selectedCity}, Việt Nam`;
+                const response = await fetch(
+                    `https://geocode.search.hereapi.com/v1/geocode?q=${encodeURIComponent(query)}&apiKey=${encodeURIComponent(HERE_API_KEY)}`
+                );
+                if (!response.ok) {
+                    throw new Error('Lỗi khi lấy tọa độ từ huyện và tỉnh');
+                }
+                const data = await response.json();
+                if (data.items && data.items.length > 0) {
+                    const { lng, lat } = data.items[0].position;
+                    setCoordinates([lng, lat]);
+                    setAddress(data.items[0].address.label || `${district}, ${selectedCity}`);
+                } else {
+                    setError('Không tìm thấy tọa độ cho khu vực này.');
+                }
+            } catch (err) {
+                setError(`Lỗi khi lấy tọa độ: ${err.message}`);
+            }
+        }
     };
 
     return (
-        <Form.Group as={Row} className="mb-3" style={{justifyContent:'space-between'}}>
+        <Form.Group as={Row} className="mb-3" style={{ justifyContent: 'space-between' }}>
             <Form.Label column md={3}>
                 Địa chỉ làm việc
             </Form.Label>
@@ -218,13 +279,13 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
                 )}
                 {error && <div className="text-danger">{error}</div>}
 
-                {/* Dropdown để chọn tỉnh */}
                 <Form.Select
                     className="mb-3"
                     value={selectedCity}
                     onChange={handleCityChange}
                     disabled={disabled || isProvinceLoading || !isMapLoaded}
-                    aria-label="Chọn tỉnh/thành phố">
+                    aria-label="Chọn tỉnh/thành phố"
+                >
                     <option value="">Chọn tỉnh/thành phố</option>
                     {provinces.map((province) => (
                         <option key={province.code} value={province.name}>
@@ -233,14 +294,13 @@ const MapAddressSelector = ({ onAddressSelect, disabled, isInvalid }) => {
                     ))}
                 </Form.Select>
 
-                {/* Dropdown để chọn huyện */}
                 <Form.Select
                     className="mb-3"
                     value={selectedDistrict}
                     onChange={handleDistrictChange}
                     disabled={!selectedCity || isDistrictLoading || !isMapLoaded || disabled}
-                    aria-label="Chọn quận/huyện">
-
+                    aria-label="Chọn quận/huyện"
+                >
                     <option value="">Chọn quận/huyện</option>
                     {districts.map((district) => (
                         <option key={district.code} value={district.name}>

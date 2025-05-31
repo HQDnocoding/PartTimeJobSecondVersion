@@ -182,7 +182,7 @@ const useCompanyForm = (navigate, setCooldown) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success(response.data.message || 'Đăng ký thành công!');
-      navigate('/login', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       let errorMessages = ['Đăng ký thất bại!'];
       if (err.response?.data?.message) {

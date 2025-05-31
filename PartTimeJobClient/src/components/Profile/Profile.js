@@ -170,11 +170,11 @@ const Profile = () => {
           <div className="text-center">
             <Spinner animation="border" size="sm" /> Đang tải danh sách...
           </div>
-        ) : followedCompanies.length === 0 ? (
+        ) : followedCompanies?.length === 0 ? (
           <p className="text-muted">Bạn chưa theo dõi công ty nào.</p>
         ) : (
           <Row>
-            {followedCompanies.map((follow) => (
+            {followedCompanies?.map((follow) => (
               <Col key={follow.companyId.id} md={4} className="mb-4">
                 <Card className="company-card shadow-sm">
                   <Card.Body>

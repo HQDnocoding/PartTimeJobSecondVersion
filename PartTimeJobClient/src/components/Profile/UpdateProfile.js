@@ -33,12 +33,17 @@ const UpdateProfile = () => {
 
     // Handle input changes
     const handleChange = (e) => {
+        setError(null);
+        setSuccess(null);
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
+
     // Handle file changes
     const handleFileChange = (e) => {
+        setError(null);
+        setSuccess(null);
         const { name, files } = e.target;
         const file = files[0];
 
@@ -52,6 +57,8 @@ const UpdateProfile = () => {
 
     // Request OTP for email
     const requestEmailOtp = async () => {
+        setError(null);
+        setSuccess(null);
         if (!formData.email) {
             setError('Vui lòng nhập email.');
             return;
@@ -69,6 +76,8 @@ const UpdateProfile = () => {
 
     // Request OTP for phone
     const requestPhoneOtp = async () => {
+        setError(null);
+        setSuccess(null);
         if (!formData.phone || !/^0[0-9]{9}$/.test(formData.phone)) {
             setError('Số điện thoại không hợp lệ (phải bắt đầu bằng 0 và có 10 chữ số).');
             return;
@@ -94,7 +103,7 @@ const UpdateProfile = () => {
         try {
             const formDataToSend = new FormData();
             console.log(user);
-            
+
             formDataToSend.append('id', user.candidate.id)
             formDataToSend.append('email', formData.email);
             formDataToSend.append('fullName', formData.fullName);
@@ -119,7 +128,9 @@ const UpdateProfile = () => {
             setSuccess('Cập nhật hồ sơ thành công!');
             setTimeout(() => navigate('/candidate/profile'), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Có lỗi xảy ra khi cập nhật hồ sơ(Kiểm tra số điện thoại hoặc email có thể đã được dùng bởi tài khoản khác ).');
+            console.log(err.response);
+
+            setError(err.response.data|| 'Có lỗi xảy ra khi cập nhật hồ sơ(Kiểm tra số điện thoại hoặc email có thể đã được dùng bởi tài khoản khác ).');
             console.error('Update error:', err);
         } finally {
             setLoading(false);

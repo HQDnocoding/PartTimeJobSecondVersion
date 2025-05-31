@@ -10,7 +10,7 @@ import './RegisterCandidate.scss';
 const RegisterCandidate = () => {
   const [inputValues, setInputValues] = useState({
     fullName: '',
-    username: '', 
+    username: '',
     dateOfBirth: '',
     selfDescription: '',
     password: '',
@@ -19,6 +19,7 @@ const RegisterCandidate = () => {
     curriculumVitaeFile: null,
     otp: '',
   });
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(0);
@@ -39,6 +40,12 @@ const RegisterCandidate = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    if (name === "avatarFile" && files && files[0]) {
+      const file = files[0];
+      setInputValues(prev => ({ ...prev, avatarFile: file }));
+      setAvatarPreview(URL.createObjectURL(file));
+      return;
+    }
     setInputValues(prev => ({
       ...prev,
       [name]: files ? files[0] : value,
@@ -62,7 +69,7 @@ const RegisterCandidate = () => {
       });
       setIsOtpSent(true);
       setCooldown(60);
-      setInputValues(prev => ({ ...prev, otp: '' })); 
+      setInputValues(prev => ({ ...prev, otp: '' }));
       toast.success(isOtpSent ? 'Đã gửi lại OTP thành công!' : 'Mã OTP đã được gửi đến email của bạn!');
     } catch (err) {
       setErrors(['Không thể gửi OTP. Vui lòng thử lại.']);
@@ -113,7 +120,7 @@ const RegisterCandidate = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success(response.data.message || 'Đăng ký thành công!');
-      navigate('/login', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       let errorMessages = ['Đăng ký thất bại!'];
       if (err.response?.data?.message) {
@@ -275,6 +282,15 @@ const RegisterCandidate = () => {
                 accept="image/jpeg,image/png"
                 required
               />
+              {avatarPreview && (
+                <div className="mt-2">
+                  <img
+                    src={avatarPreview}
+                    alt="Ảnh đại diện xem trước"
+                    style={{ maxWidth: "150px", maxHeight: "150px", borderRadius: "8px" }}
+                  />
+                </div>
+              )}
             </Col>
           </Row>
         </Form.Group>
