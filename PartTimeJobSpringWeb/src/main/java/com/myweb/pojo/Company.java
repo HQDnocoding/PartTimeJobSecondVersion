@@ -60,7 +60,7 @@ public class Company implements Serializable {
     @Column(name = "name")
     private String name;
     @Basic(optional = false)
-    @NotNull()
+    @NotNull
     @Size(min = 1, max = 200)
     @Column(name = "avatar")
     private String avatar;
@@ -76,7 +76,7 @@ public class Company implements Serializable {
     private String taxCode;
 
     @Basic(optional = false)
-    @NotNull()
+    @NotNull
     @Size(min = 1, max = 300)
     @Column(name = "full_address")
     private String fullAddress;

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Chi tiết chứng thực công ty</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="base :: bootstrap"></th:block>
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+        }
+        .img-preview {
+            max-width: 300px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .status-badge {
+            font-size: 0.9em;
+        }
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+    <main class="container my-4">
+        <h3 class="mb-4">Chi tiết chứng thực công ty</h3>
+
+        <!-- Thông tin công ty -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Thông tin công ty</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Tên công ty:</strong> <span th:text="${companyAuth.companyId.name}"></span></p>
+                        <p><strong>Mã số thuế:</strong> <span th:text="${companyAuth.companyId.taxCode}"></span></p>
+                        <p><strong>Địa chỉ:</strong> <span th:text="${companyAuth.companyId.fullAddress}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Thành phố:</strong> <span th:text="${companyAuth.companyId.city}"></span></p>
+                        <p><strong>Quận/Huyện:</strong> <span th:text="${companyAuth.companyId.district}"></span></p>
+                        <p><strong>Trạng thái:</strong>
+                            <span class="badge"
+                                  th:switch="${companyAuth.companyId.status}"
+                                  th:classappend="
+                                  ${companyAuth.companyId.status == 'approved'} ? 'bg-success' :
+                                  (${companyAuth.companyId.status == 'refused'} ? 'bg-danger' : 'bg-warning')"
+                                  >
+                                <span th:case="'approved'">Đã duyệt</span>
+                                <span th:case="'refused'">Bị từ chối</span>
+                                <span th:case="*">Chờ xử lý</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin chứng thực -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Thông tin chứng thực</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Giấy phép kinh doanh:</strong></p>
+                        <a th:if="${companyAuth.paper}" th:href="${companyAuth.paper}" target="_blank">Mở</a>
+                        <p th:unless="${companyAuth.paper}" class="text-muted">Chưa có giấy phép</p>
+
+                        <a th:href="${companyAuth.idCardFront}" target="_blank"><p><strong>Mặt trước CMND/CCCD:</strong></p></a>
+                        <img th:if="${companyAuth.idCardFront}" th:src="${companyAuth.idCardFront}" alt="Mặt trước CMND/CCCD" class="img-preview">
+                        <p th:unless="${companyAuth.idCardFront}" class="text-muted">Chưa có ảnh</p>
+                    </div>
+                    <div class="col-md-6">
+                        <a th:href="${companyAuth.idCardBack}" target="_blank"><p><strong>Mặt sau CMND/CCCD:</strong></p>  </a>    
+                        <img th:if="${companyAuth.idCardBack}" th:src="${companyAuth.idCardBack}" alt="Mặt sau CMND/CCCD" class="img-preview">
+                        <p th:unless="${companyAuth.idCardBack}" class="text-muted">Chưa có ảnh</p>
+
+                        <p><strong>Trạng thái:</strong>
+
+                            <span class="badge status-badge"
+                                  th:switch="${companyAuth.status}"
+                                  th:classappend="
+                                  ${companyAuth.status == 'approved'} ? 'bg-success' :
+                                  (${companyAuth.status == 'refused'} ? 'bg-danger' : 'bg-warning')"
+                                  >
+                                <span th:case="'approved'">Đã duyệt</span>
+                                <span th:case="'refused'">Bị từ chối</span>
+                                <span th:case="*">Chờ xử lý</span>
+                            </span>
+                        </p>
+                        <p><strong>Ngày cập nhật:</strong> <span th:text="${#dates.format(companyAuth.lastUpdated, 'dd/MM/yyyy HH:mm')}"></span></p>
+                        <p><strong>Feedback:</strong> <span th:text="${companyAuth.feedback} ?: 'Chưa có feedback'"></span></p>
+                    </div>
+                </div>
+                <div class="mt-3" th:if="${companyAuth.status == 'pending'}">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateStatusModal">Duyệt chứng thực</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal duyệt chứng thực -->
+        <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateStatusModalLabel">Cập nhật trạng thái chứng thực</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{'/company-authentications/'+${companyAuth.id}+'/update-status'}" method="post" th:object="${companyAuth}">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="status" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option value="approved">Duyệt</option>
+                                    <option value="refused">Từ chối</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedback" class="form-label">Feedback (tùy chọn)</label>
+                                <textarea class="form-control" id="feedback" th:field="*{feedback}" rows="4" placeholder="Nhập lý do hoặc feedback..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                        <input th:field="*{idCardFront}" hidden/>
+                        <input th:field="*{idCardBack}" hidden/>
+                        <input th:field="*{paper}" hidden/>
+                        <input th:field="*{companyId}" hidden/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="base :: footer"></div>
+
+    <script>
+        // Xử lý form submit trong modal
+        document.querySelector('#updateStatusModal form').addEventListener('submit', function (e) {
+            const status = this.querySelector('#status').value;
+            const feedback = this.querySelector('#feedback').value.trim();
+            if (status === 'approved' && !feedback) {
+                if (!confirm('Bạn có chắc muốn duyệt mà không nhập feedback?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
