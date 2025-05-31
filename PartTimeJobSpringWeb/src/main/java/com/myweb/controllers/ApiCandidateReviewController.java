@@ -63,4 +63,12 @@ public class ApiCandidateReviewController {
         Double avgRating = reviewService.getAverageRating(candidateId);
         return new ResponseEntity<>(avgRating, HttpStatus.OK);
     }
+
+    @GetMapping("/candidate-reviews/company/{companyId}")
+    public ResponseEntity<Map<String, Object>> getReviewsByCompany(
+            @PathVariable("companyId") Integer companyId,
+            @RequestParam(required = false) Map<String, String> params) {
+        Map<String, Object> result = reviewService.getReviewsByCompany(params, companyId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

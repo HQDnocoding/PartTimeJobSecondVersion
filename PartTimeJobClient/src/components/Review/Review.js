@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Table, Pagination } from 'react-bootstrap';
-import { authApis } from '../../configs/APIs';
+import { authApis, endpoints } from '../../configs/APIs';
 import { MyUserContext } from '../../configs/Contexts';
 import { toast } from 'react-hot-toast';
 import rolesAndStatus from '../../utils/rolesAndStatus';
+import ReviewFilter from './ReviewFilter';
 
 const Review = () => {
   const user = useContext(MyUserContext);
@@ -15,49 +16,69 @@ const Review = () => {
     totalItems: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    candidateName: '',
+    jobName: '',
+    companyName: '',
+  });
 
   useEffect(() => {
     const loadReviews = async () => {
       setLoading(true);
       try {
+        if (!user) {
+          toast.error('Vui lòng đăng nhập để xem đánh giá');
+          return;
+        }
+
+        if (user.role !== rolesAndStatus.company) {
+          toast.error('Chỉ công ty mới có quyền xem đánh giá ứng viên');
+          return;
+        }
+
+        // Lấy companyId từ user
+        const companyRes = await authApis().get(endpoints['getCompanyByUserId'](user.id));
+        if (companyRes.status !== 200) {
+          throw new Error('Không thể lấy thông tin công ty');
+        }
+        const companyId = companyRes.data.id;
+
+        // Gọi API mới với bộ lọc
         const params = new URLSearchParams({
           page: pagination.currentPage,
           pageSize: pagination.pageSize,
+          candidateName: filters.candidateName,
+          jobName: filters.jobName,
+          companyName: filters.companyName,
         }).toString();
-        
-        const endpoint = user?.role === rolesAndStatus.candidate 
-          ? `/secure/reviews/candidate` // Lấy đánh giá về công ty
-          : `/secure/reviews/company`; // Lấy đánh giá về ứng viên
 
-        const res = await authApis().get(`${endpoint}?${params}`);
+        const res = await authApis().get(`${endpoints['getCandidateReviewsByCompany'](companyId)}?${params}`);
         if (res.status === 200) {
-          const responseData = res.data.data || {};
-          setReviews(responseData.reviews || []);
-          setPagination({
-            currentPage: responseData.currentPage || 1,
-            totalPages: responseData.totalPages || 1,
-            pageSize: responseData.pageSize || 6,
-            totalItems: responseData.totalItems || 0,
-          });
+          setReviews(res.data.reviews || []);
+          setPagination((prev) => ({
+            ...prev,
+            totalItems: res.data.totalItems || 0,
+            totalPages: res.data.totalPages || 1,
+          }));
         } else {
-          toast.error('Không thể tải danh sách đánh giá');
+          throw new Error('Không thể lấy danh sách đánh giá');
         }
       } catch (error) {
         console.error('Lỗi khi tải đánh giá:', error);
-        toast.error('Lỗi khi tải đánh giá');
+        toast.error(error.message || 'Lỗi khi tải đánh giá');
       } finally {
         setLoading(false);
       }
     };
+
     if (user) {
       loadReviews();
     }
-  }, [user, pagination.currentPage]);
+  }, [user, pagination.currentPage, filters]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, currentPage: page }));
-      setLoading(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -127,6 +148,7 @@ const Review = () => {
   };
 
   const formatDate = (timestamp) => {
+    if (!timestamp) return 'N/A';
     return new Date(timestamp).toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
@@ -136,9 +158,9 @@ const Review = () => {
 
   return (
     <div className="review-page container my-5">
-      <h1 className="page-title mb-4">
-        {user?.role === rolesAndStatus.candidate ? 'Đánh giá công ty' : 'Đánh giá ứng viên'}
-      </h1>
+      <h1 className="page-title mb-4">Đánh giá về ứng viên</h1>
+
+      <ReviewFilter onFilterChange={setFilters} />
 
       <Card className="reviews-card shadow-sm">
         <Card.Body>
@@ -146,17 +168,9 @@ const Review = () => {
             <thead>
               <tr>
                 <th>#</th>
-                {user?.role === rolesAndStatus.candidate ? (
-                  <>
-                    <th>Công ty</th>
-                    <th>Công việc</th>
-                  </>
-                ) : (
-                  <>
-                    <th>Ứng viên</th>
-                    <th>Công việc</th>
-                  </>
-                )}
+                <th>Ứng viên</th>
+                <th>Công việc</th>
+                <th>Công ty đánh giá</th>
                 <th>Điểm đánh giá</th>
                 <th>Nhận xét</th>
                 <th>Ngày đánh giá</th>
@@ -165,33 +179,25 @@ const Review = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={user?.role === rolesAndStatus.candidate ? 6 : 6} className="text-center">
+                  <td colSpan={7} className="text-center">
                     Đang tải...
                   </td>
                 </tr>
               ) : reviews.length > 0 ? (
                 reviews.map((review, index) => (
-                  <tr key={review.id}>
+                  <tr key={review.id || index}>
                     <td>{(pagination.currentPage - 1) * pagination.pageSize + index + 1}</td>
-                    {user?.role === rolesAndStatus.candidate ? (
-                      <>
-                        <td>{review.company?.name}</td>
-                        <td>{review.job?.jobName}</td>
-                      </>
-                    ) : (
-                      <>
-                        <td>{review.candidate?.fullName}</td>
-                        <td>{review.job?.jobName}</td>
-                      </>
-                    )}
-                    <td>{review.rating}/5</td>
-                    <td>{review.comment}</td>
-                    <td>{formatDate(review.createdAt)}</td>
+                    <td>{review.candidateId?.fullName || 'N/A'}</td>
+                    <td>{review.jobId?.jobName || 'N/A'}</td>
+                    <td>{review.companyId?.companyName || 'N/A'}</td>
+                    <td>{review.rating ? `${review.rating}/5` : 'N/A'}</td>
+                    <td>{review.review || 'N/A'}</td>
+                    <td>{formatDate(review.reviewDate)}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={user?.role === rolesAndStatus.candidate ? 6 : 6} className="text-center">
+                  <td colSpan={7} className="text-center">
                     Chưa có đánh giá nào.
                   </td>
                 </tr>

@@ -22,4 +22,6 @@ public interface CandidateReviewService {
     void deleteReview(Integer id, Principal principal);
 
     Double getAverageRating(Integer candidateId);
+    
+    Map<String, Object> getReviewsByCompany(Map<String, String> params, Integer companyId);
 }

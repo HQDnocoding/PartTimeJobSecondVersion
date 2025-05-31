@@ -12,6 +12,7 @@ import com.myweb.utils.GeneralUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
@@ -120,5 +121,44 @@ public class CompanyReviewRepositoryImplement implements CompanyReviewRepository
 
         Double result = session.createQuery(query).getSingleResult();
         return result != null ? result : 0.0;
+    }
+    
+    @Override
+    public Map<String, Object> getReviewsByCandidate(Map<String, String> params, Integer candidateId) {
+        Session session = factory.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<CompanyReview> query = builder.createQuery(CompanyReview.class);
+        Root<CompanyReview> root = query.from(CompanyReview.class);
+
+        root.fetch("companyId", JoinType.LEFT);
+        root.fetch("candidateId", JoinType.LEFT);
+        root.fetch("applicationId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("candidateId").get("id"), candidateId));
+
+        query.where(predicates.toArray(new Predicate[0]));
+        query.orderBy(builder.desc(root.get("reviewDate")));
+
+        int page = params != null && params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+        int pageSize = GeneralUtils.PAGE_SIZE;
+        int start = (page - 1) * pageSize;
+
+        Query<CompanyReview> q = session.createQuery(query);
+        List<CompanyReview> reviews = q.setFirstResult(start).setMaxResults(pageSize).getResultList();
+
+        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+        Root<CompanyReview> countRoot = countQuery.from(CompanyReview.class);
+        countQuery.select(builder.count(countRoot));
+        countQuery.where(builder.equal(countRoot.get("candidateId").get("id"), candidateId));
+        Long total = session.createQuery(countQuery).getSingleResult();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("reviews", reviews);
+        result.put("currentPage", page);
+        result.put("totalPages", (int) Math.ceil(total.doubleValue() / pageSize));
+        result.put("totalItems", total);
+
+        return result;
     }
 }

@@ -51,12 +51,14 @@ public class CandidateReviewRepositoryImplement implements CandidateReviewReposi
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<CandidateReview> query = builder.createQuery(CandidateReview.class);
         Root<CandidateReview> root = query.from(CandidateReview.class);
-        Join<CandidateReview, Job> jobJoin = root.join("jobId", JoinType.LEFT);
-        Join<Job, Application> applicationJoin = jobJoin.join("applicationCollection", JoinType.LEFT);
-        Join<Application, Candidate> candidateJoin = applicationJoin.join("candidateId", JoinType.LEFT);
+
+        // Nạp các thực thể liên quan
+        root.fetch("companyId", JoinType.LEFT);
+        root.fetch("jobId", JoinType.LEFT);
+        root.fetch("candidateId", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(builder.equal(candidateJoin.get("id"), candidateId));
+        predicates.add(builder.equal(root.get("candidateId").get("id"), candidateId));
 
         if (params != null && params.containsKey("rating")) {
             try {
@@ -76,20 +78,11 @@ public class CandidateReviewRepositoryImplement implements CandidateReviewReposi
 
         Query<CandidateReview> q = session.createQuery(query);
         List<CandidateReview> reviews = q.setFirstResult(start).setMaxResults(pageSize).getResultList();
-        for (CandidateReview review : reviews) {
-            if (review.getJobId() != null) {
-                Hibernate.initialize(review.getJobId().getApplicationCollection());
-            }
-        }
 
         CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
         Root<CandidateReview> countRoot = countQuery.from(CandidateReview.class);
-        Join<CandidateReview, Job> countJobJoin = countRoot.join("jobId", JoinType.LEFT);
-        Join<Job, Application> countApplicationJoin = countJobJoin.join("applicationCollection", JoinType.LEFT);
-        Join<Application, Candidate> countCandidateJoin = countApplicationJoin.join("candidateId", JoinType.LEFT);
-
         countQuery.select(builder.count(countRoot));
-        countQuery.where(builder.equal(countCandidateJoin.get("id"), candidateId));
+        countQuery.where(builder.equal(countRoot.get("candidateId").get("id"), candidateId));
         Long total = session.createQuery(countQuery).getSingleResult();
 
         Map<String, Object> result = new HashMap<>();
@@ -127,12 +120,12 @@ public class CandidateReviewRepositoryImplement implements CandidateReviewReposi
         Join<Application, Candidate> candidateJoin = applicationJoin.join("candidateId", JoinType.LEFT);
 
         query.select(builder.avg(root.get("rating")))
-             .where(builder.equal(candidateJoin.get("id"), candidateId));
+                .where(builder.equal(candidateJoin.get("id"), candidateId));
 
         Double result = session.createQuery(query).getSingleResult();
         return result != null ? result : 0.0;
     }
-    
+
     @Override
     public CandidateReview findByCandidateIdAndJobId(Integer candidateId, Integer jobId) {
         Session session = factory.getObject().getCurrentSession();
@@ -140,5 +133,72 @@ public class CandidateReviewRepositoryImplement implements CandidateReviewReposi
         query.setParameter("candidateId", candidateId);
         query.setParameter("jobId", jobId);
         return query.getSingleResultOrNull();
+    }
+    
+    @Override
+    public Map<String, Object> getReviewsByCompany(Map<String, String> params, Integer companyId) {
+        Session session = factory.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<CandidateReview> query = builder.createQuery(CandidateReview.class);
+        Root<CandidateReview> root = query.from(CandidateReview.class);
+        Join<CandidateReview, Candidate> candidateJoin = root.join("candidateId");
+        Join<Candidate, Application> applicationJoin = candidateJoin.join("applicationCollection", JoinType.LEFT);
+        Join<Application, Job> jobJoin = applicationJoin.join("jobId", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(jobJoin.get("companyId").get("id"), companyId));
+
+        // Thêm bộ lọc
+        if (params.containsKey("candidateName")) {
+            predicates.add(builder.like(
+                builder.lower(candidateJoin.get("fullName")),
+                "%" + params.get("candidateName").toLowerCase() + "%"
+            ));
+        }
+        if (params.containsKey("jobName")) {
+            predicates.add(builder.like(
+                builder.lower(jobJoin.get("jobName")),
+                "%" + params.get("jobName").toLowerCase() + "%"
+            ));
+        }
+        if (params.containsKey("companyName")) {
+            predicates.add(builder.like(
+                builder.lower(root.get("companyId").get("companyName")),
+                "%" + params.get("companyName").toLowerCase() + "%"
+            ));
+        }
+
+        query.where(predicates.toArray(new Predicate[0]));
+        query.orderBy(builder.desc(root.get("reviewDate")));
+
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 1;
+        int pageSize = GeneralUtils.PAGE_SIZE;
+        int start = (page - 1) * pageSize;
+
+        Query<CandidateReview> q = session.createQuery(query);
+        List<CandidateReview> reviews = q.setFirstResult(start).setMaxResults(pageSize).getResultList();
+        for (CandidateReview review : reviews) {
+            Hibernate.initialize(review.getCandidateId());
+            Hibernate.initialize(review.getJobId());
+            Hibernate.initialize(review.getCompanyId());
+        }
+
+        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+        Root<CandidateReview> countRoot = countQuery.from(CandidateReview.class);
+        Join<CandidateReview, Candidate> countCandidateJoin = countRoot.join("candidateId");
+        Join<Candidate, Application> countApplicationJoin = countCandidateJoin.join("applicationCollection", JoinType.LEFT);
+        Join<Application, Job> countJobJoin = countApplicationJoin.join("jobId", JoinType.LEFT);
+
+        countQuery.select(builder.count(countRoot));
+        countQuery.where(builder.equal(countJobJoin.get("companyId").get("id"), companyId));
+        Long total = session.createQuery(countQuery).getSingleResult();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("reviews", reviews);
+        result.put("currentPage", page);
+        result.put("totalPages", (int) Math.ceil(total.doubleValue() / pageSize));
+        result.put("totalItems", total);
+
+        return result;
     }
 }

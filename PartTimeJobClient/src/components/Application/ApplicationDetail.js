@@ -18,6 +18,7 @@ const ApplicationDetail = () => {
     const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [review, setReview] = useState(null); // State để lưu đánh giá
     const { isOpen, setIsOpen } = useContext(MyChatBoxContext);
     const { receiver, setReceiver } = useContext(MyReceiverContext);
 
@@ -35,7 +36,7 @@ const ApplicationDetail = () => {
     };
 
     useEffect(() => {
-        const loadApplication = async () => {
+        const loadApplicationAndReview = async () => {
             setLoading(true);
             try {
                 // Kiểm tra token và user
@@ -45,29 +46,33 @@ const ApplicationDetail = () => {
                     return;
                 }
 
-                const res = await authApis().get(endpoints['getApplicationDetail'](id));
-                if (res.status === 200) {
-                    setApplication(res.data.data);
-                    console.log('Application data:', res.data.data);
+                // Tải chi tiết ứng tuyển
+                const appRes = await authApis().get(endpoints['getApplicationDetail'](id));
+                if (appRes.status === 200) {
+                    setApplication(appRes.data.data);
+                    console.log('Application data:', appRes.data.data);
+
+                    // Tải đánh giá của công ty về ứng viên (nếu có)
+                    const reviewRes = await authApis().get(endpoints['getCandidateReviewById'](appRes.data.data.candidateId.id));
+                    if (reviewRes.status === 200 && reviewRes.data) {
+                        setReview(reviewRes.data);
+                    } else {
+                        setReview(null); // Không có đánh giá
+                    }
                 } else {
                     setError('Không thể tải chi tiết ứng tuyển');
                     toast.error('Không thể tải chi tiết ứng tuyển');
                 }
             } catch (error) {
-                console.error('Lỗi khi tải chi tiết ứng tuyển:', error);
-                setError(error.response?.data?.message || 'Lỗi khi tải chi tiết ứng tuyển');
-                toast.error(error.response?.data?.message || 'Lỗi khi tải chi tiết ứng tuyển');
+                console.error('Lỗi khi tải dữ liệu:', error);
+                setError(error.response?.data?.message || 'Lỗi khi tải dữ liệu');
+                toast.error(error.response?.data?.message || 'Lỗi khi tải dữ liệu');
             } finally {
                 setLoading(false);
             }
         };
-        loadApplication();
+        loadApplicationAndReview();
     }, [id, navigate, user]);
-
-    useEffect(() => {
-        console.log('Current application:', application);
-        console.log('Current user:', user);
-    }, [application, user]);
 
     const updateStatus = async (newStatus) => {
         setLoading(true);
@@ -258,7 +263,13 @@ const ApplicationDetail = () => {
                                 </div>
                             )}
                             {/* Tích hợp CandidateReview */}
-                            <CandidateReview application={application} userRole={user?.role} roles={roles} />
+                            <CandidateReview 
+                                application={application} 
+                                userRole={user?.role} 
+                                roles={roles} 
+                                review={review} 
+                                setReview={setReview}
+                            />
                         </Card.Body>
                         <Card.Footer className="text-center">
                             <div className="action-buttons mt-4 text-center">

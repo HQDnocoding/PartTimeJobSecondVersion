@@ -34,6 +34,7 @@ import java.util.Date;
     @NamedQuery(name = "CandidateReview.findByReview", query = "SELECT c FROM CandidateReview c WHERE c.review = :review"),
     @NamedQuery(name = "CandidateReview.findByReviewDate", query = "SELECT c FROM CandidateReview c WHERE c.reviewDate = :reviewDate"),
     @NamedQuery(name = "CandidateReview.findByRating", query = "SELECT c FROM CandidateReview c WHERE c.rating = :rating")})
+    @NamedQuery(name = "CandidateReview.findByCandidateIdAndJobId", query = "SELECT c FROM CandidateReview c WHERE c.candidateId.id = :candidateId AND c.jobId.id = :jobId")
 public class CandidateReview implements Serializable {
 
     private static final long serialVersionUID = 1L;

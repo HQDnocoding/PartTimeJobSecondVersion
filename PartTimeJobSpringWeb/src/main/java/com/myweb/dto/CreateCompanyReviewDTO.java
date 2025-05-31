@@ -18,6 +18,9 @@ public class CreateCompanyReviewDTO {
     private Integer jobId;
 
     @NotNull
+    private Integer applicationId;
+
+    @NotNull
     @Min(1)
     @Max(5)
     private Integer rating;
@@ -37,6 +40,14 @@ public class CreateCompanyReviewDTO {
 
     public Integer getJobId() {
         return jobId;
+    }
+
+    public Integer getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(Integer applicationId) {
+        this.applicationId = applicationId;
     }
 
     public void setJobId(Integer jobId) {
