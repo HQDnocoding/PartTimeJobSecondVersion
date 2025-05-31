@@ -58,7 +58,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" id="userId" disabled  class="form-control" th:field="*{userId.username}" required/>
+                                <input type="email" id="email" disabled  class="form-control" th:field="*{userId.username}" required/>
                             </div>
                             <div class="mb-3">
                                 <label for="dateOfBirth" class="form-label">Ngày sinh</label>
@@ -92,7 +92,7 @@
                     <button id="submitButton" type="submit" class="btn btn-primary">Lưu</button>
                     <a class="btn btn-danger" th:onclick="'deleteObject(event, \'' + @{/api/admin/candidates} + '\', ' + *{id} + ')'"
                        >Xóa</a>
-                    <a href="/candidates" class="btn btn-secondary">Quay lại danh sách</a>
+                    <a th:href="@{/candidates}" class="btn btn-secondary">Quay lại danh sách</a>
                 </div>
             </div>
             <input type="hidden" th:field="*{id}" />

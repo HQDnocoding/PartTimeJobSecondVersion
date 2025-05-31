@@ -90,16 +90,16 @@ public class CompanyRepositoryImplement implements CompanyRepository {
         Root<Company> companyRoot = cq.from(Company.class);
         cq.where(buildPredicates(params, cb, companyRoot).toArray(new Predicate[0]));
 
+        cq.orderBy(cb.desc(companyRoot.get("userId").get("registerDate")));
+
         Query query = session.createQuery(cq);
 
         // Phân trang
         int page = 1;
         try {
             page = Integer.parseInt(params.getOrDefault("page", "1"));
-            System.out.println("cpage" + page);
-            
+
         } catch (NumberFormatException e) {
-            System.out.println("Invalid page number, defaulting to 1");
         }
         int pageSize = GeneralUtils.PAGE_SIZE;
         int start = (page - 1) * pageSize;
@@ -111,8 +111,7 @@ public class CompanyRepositoryImplement implements CompanyRepository {
 
         // Tính tổng số trang
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-        System.out.println("page" + page);
-        System.out.println("total" + totalPages);
+       
         if (totalPages < page || page <= 0) {
             page = 1;
         }

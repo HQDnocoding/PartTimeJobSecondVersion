@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.client.HttpClientErrorException;
 
 /**
@@ -215,72 +216,73 @@ public class CandidateServiceImplement implements CandidateService {
     public Candidate updateCadidate(Candidate candidate, Principal principal, int id) {
         boolean isValidOTPMail = false, isValidOTPPhone = false;
 
-        try {
-            Candidate can = this.candidateRepository.getCandidateById(candidate.getId());
+        Candidate can = this.candidateRepository.getCandidateById(candidate.getId());
 
-            User user = this.userRepository.getUserByUsername(principal.getName());
-            if (id != user.getId()) {
-                throw new Exception("Không có quyền cập nhật");
-            } else {
-                if (candidate.getPhone() != null && Pattern.matches("^0[0-9]{9}$", candidate.getPhone())) {
-                    if (can.getPhone() == null || !can.getPhone().equals(candidate.getPhone())) {
+        User user = this.userRepository.getUserByUsername(principal.getName());
+        if (id != user.getId()) {
+            throw new AuthorizationServiceException("Không có quyền cập nhật");
+        } else {
+            if (candidate.getPhone() != null && Pattern.matches("^0[0-9]{9}$", candidate.getPhone())) {
+                if (can.getPhone() == null || !can.getPhone().equals(candidate.getPhone())) {
+                    if (candidateRepository.getCandidateByPhone(candidate.getPhone()) != null) {
+                        throw new IllegalArgumentException("Số điện thoại này đã được sử dụng.");
+                    }
 
-                        if (candidate.getOtpPhone() != null && !candidate.getOtpPhone().isBlank()) {
+                    if (candidate.getOtpPhone() != null && !candidate.getOtpPhone().isBlank()) {
 
-                            isValidOTPPhone = this.otpService.verifyOtp(candidate.getPhone(), candidate.getOtpPhone());
+                        isValidOTPPhone = this.otpService.verifyOtp(candidate.getPhone(), candidate.getOtpPhone());
 
-                            if (!isValidOTPPhone) {
-                                throw new IllegalArgumentException("Sai mã OTP của số điện thoại");
-                            }
-                            this.otpService.removeOTP(candidate.getPhone());
-                        } else {
-                            throw new IllegalArgumentException("Thiếu OTP cho để xác thực số điện thoại");
+                        if (!isValidOTPPhone) {
+                            throw new IllegalArgumentException("Sai mã OTP của số điện thoại");
                         }
+                        this.otpService.removeOTP(candidate.getPhone());
+                    } else {
+                        throw new IllegalArgumentException("Thiếu OTP cho để xác thực số điện thoại");
                     }
                 }
-                if (candidate.getEmail() != null && Pattern.matches("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", candidate.getEmail())) {
-                    if (can.getUserId().getUsername() == null || !can.getUserId().getUsername().equals(candidate.getEmail())) {
-                        if (candidate.getOtpMail() != null && !candidate.getOtpMail().isBlank()) {
-                            isValidOTPMail = this.otpService.verifyOtp(candidate.getEmail(), candidate.getOtpMail());
-                            if (!isValidOTPMail) {
-                                throw new IllegalArgumentException("Sai mã OTP của email");
-                            }
-                            this.otpService.removeOTP(candidate.getEmail());
-                        } else {
-                            throw new IllegalArgumentException("Thiếu OTP cho xác thực email");
+            }
+            if (candidate.getEmail() != null && Pattern.matches("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", candidate.getEmail())) {
+                if (can.getUserId().getUsername() == null || !can.getUserId().getUsername().equals(candidate.getEmail())) {
+                    if (candidate.getOtpMail() != null && !candidate.getOtpMail().isBlank()) {
+                        if (userRepository.getUserByUsername(candidate.getEmail()) != null) {
+                            throw new IllegalArgumentException("Email đã được sử dụng.");
                         }
+                        isValidOTPMail = this.otpService.verifyOtp(candidate.getEmail(), candidate.getOtpMail());
+                        if (!isValidOTPMail) {
+                            throw new IllegalArgumentException("Sai mã OTP của email");
+                        }
+                        this.otpService.removeOTP(candidate.getEmail());
+                    } else {
+                        throw new IllegalArgumentException("Thiếu OTP cho xác thực email");
                     }
-                }
-
-                if (isValidOTPMail) {
-                    can.getUserId().setUsername(candidate.getEmail());
-                }
-                if (isValidOTPPhone) {
-                    can.setPhone(candidate.getPhone());
-                }
-                can.setDateOfBirth(candidate.getDateOfBirth());
-                can.setFullName(candidate.getFullName());
-                can.setCity(candidate.getCity());
-                can.setSelfDescription(candidate.getSelfDescription());
-                if (candidate.getCurriculumVitaeFile() != null && !candidate.getCurriculumVitaeFile().isEmpty()) {
-                    can.setCurriculumVitae(GeneralUtils.uploadFileToCloud(cloudinary, candidate.getCurriculumVitaeFile()));
-                }
-                if (candidate.getAvatarFile() != null && !candidate.getAvatarFile().isEmpty()) {
-                    can.setAvatar(GeneralUtils.uploadFileToCloud(cloudinary, candidate.getAvatarFile()));
                 }
             }
 
-            return this.candidateRepository.updateCandidate(can);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            if (isValidOTPMail) {
+                can.getUserId().setUsername(candidate.getEmail());
+            }
+            if (isValidOTPPhone) {
+                can.setPhone(candidate.getPhone());
+            }
+            can.setDateOfBirth(candidate.getDateOfBirth());
+            can.setFullName(candidate.getFullName());
+            can.setCity(candidate.getCity());
+            can.setSelfDescription(candidate.getSelfDescription());
+            if (candidate.getCurriculumVitaeFile() != null && !candidate.getCurriculumVitaeFile().isEmpty()) {
+                can.setCurriculumVitae(GeneralUtils.uploadFileToCloud(cloudinary, candidate.getCurriculumVitaeFile()));
+            }
+            if (candidate.getAvatarFile() != null && !candidate.getAvatarFile().isEmpty()) {
+                can.setAvatar(GeneralUtils.uploadFileToCloud(cloudinary, candidate.getAvatarFile()));
+            }
         }
+
+        return this.candidateRepository.updateCandidate(can);
 
     }
 
     @Override
     public Map<String, Object> getUserIdAndRole(int id) {
-        User user = this.candidateRepository.getUser(id); 
+        User user = this.candidateRepository.getUser(id);
         Map<String, Object> map = new HashMap<>();
         map.put("id", user.getId());
         map.put("role", user.getRole());

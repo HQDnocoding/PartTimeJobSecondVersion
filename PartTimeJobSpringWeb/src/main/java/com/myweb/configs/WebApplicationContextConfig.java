@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.myweb.formatters.CandidateFormatter;
+import com.myweb.formatters.CompanyFormatter;
 import com.myweb.formatters.JobFormatter;
 import com.myweb.formatters.UserFormatter;
 import org.springframework.context.annotation.Bean;
@@ -63,6 +64,7 @@ public class WebApplicationContextConfig implements WebMvcConfigurer {
         registry.addFormatter(new CandidateFormatter());
         registry.addFormatter(new JobFormatter());
         registry.addFormatter(new UserFormatter());
+        registry.addFormatter(new CompanyFormatter());
     }
 
     @Override

@@ -15,5 +15,6 @@
     <class>com.myweb.pojo.Application</class>
     <class>com.myweb.pojo.DayJob</class>
     <class>com.myweb.pojo.MajorJob</class>
+    <class>com.myweb.pojo.CompanyAuthentication</class>
   </persistence-unit>
 </persistence>

@@ -31,9 +31,7 @@ public class JwtFilters extends OncePerRequestFilter {
             if (header == null || !header.startsWith("Bearer ")) {
                 logger.warn("Missing or invalid Authorization header");
                 SecurityContextHolder.clearContext();
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\": \"Missing or invalid Authorization header.\"}");
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header.");
                 return;
             }
 
@@ -55,21 +53,31 @@ public class JwtFilters extends OncePerRequestFilter {
                 } else {
                     logger.warn("Username is null after token validation");
                     SecurityContextHolder.clearContext();
-                    response.setContentType("application/json");
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("{\"error\": \"Invalid token: username is null.\"}");
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token: username is null.");
                     return;
                 }
             } catch (Exception e) {
                 logger.error("Error validating token: {}", e.getMessage(), e);
                 SecurityContextHolder.clearContext();
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\": \"Token không hợp lệ hoặc hết hạn: " + e.getMessage() + "\"}");
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ hoặc hết hạn: " + e.getMessage());
                 return;
             }
         }
 
         chain.doFilter(request, response);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String errorMessage)
+            throws IOException {
+        if (!response.isCommitted()) {
+            logger.info("Sending error response: {}", errorMessage);
+            response.setStatus(status);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"" + errorMessage + "\"}");
+            response.getWriter().flush();
+        } else {
+            logger.warn("Response already committed, cannot send error: {}", errorMessage);
+        }
     }
 }

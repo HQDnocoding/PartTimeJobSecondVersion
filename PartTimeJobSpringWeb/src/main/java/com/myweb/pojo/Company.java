@@ -59,9 +59,8 @@ public class Company implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "name")
     private String name;
-
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 200)
     @Column(name = "avatar")
     private String avatar;
@@ -77,7 +76,7 @@ public class Company implements Serializable {
     private String taxCode;
 
     @Basic(optional = false)
-    @NotNull
+    @NotNull()
     @Size(min = 1, max = 300)
     @Column(name = "full_address")
     private String fullAddress;
@@ -99,6 +98,9 @@ public class Company implements Serializable {
     @Size(min = 1, max = 8)
     @Column(name = "status")
     private String status;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "companyId")
+    private CompanyAuthentication companyAuthentication;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "companyId", fetch = FetchType.EAGER)
 //    @JsonIgnore
@@ -151,22 +153,6 @@ public class Company implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
     public String getSelfDescription() {
         return selfDescription;
     }
@@ -189,30 +175,6 @@ public class Company implements Serializable {
 
     public void setFullAddress(String fullAddress) {
         this.fullAddress = fullAddress;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Collection<ImageWorkplace> getImageWorkplaceCollection() {
@@ -292,6 +254,54 @@ public class Company implements Serializable {
      */
     public void setAvatarFile(MultipartFile avatarFile) {
         this.avatarFile = avatarFile;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public CompanyAuthentication getCompanyAuthentication() {
+        return companyAuthentication;
+    }
+
+    public void setCompanyAuthentication(CompanyAuthentication companyAuthentication) {
+        this.companyAuthentication = companyAuthentication;
     }
 
 }

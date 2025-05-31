@@ -39,21 +39,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
     "com.myweb.services"
 })
 public class SpringSecurityConfigs {
-
+    
     @Autowired
     @Qualifier("userDetailsService")
     private UserDetailsService userDetailsService;
-
+    
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
         return new HandlerMappingIntrospector();
     }
-
+    
     @Bean
     public Cloudinary cloudinary() {
         String apiSecret = System.getenv("API_SECRET_CLOUDINARY");
@@ -64,13 +64,13 @@ public class SpringSecurityConfigs {
                 "secure", true));
         return cloudinary;
     }
-
+    
     @Bean
     public SecureRandom create() {
         SecureRandom secureRandom = new SecureRandom();
         return secureRandom;
     }
-
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(c -> c.disable())
@@ -88,11 +88,12 @@ public class SpringSecurityConfigs {
                 .requestMatchers("/api/jobs/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH, "/api/secure/applications/update-status").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers(HttpMethod.GET, "/api/secure/applications/**").hasAnyRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName(), GeneralUtils.Role.ROLE_COMPANY.getShortName())
-                .requestMatchers(HttpMethod.POST, "/api/secure/jobs/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
+                .requestMatchers("/api/secure/jobs/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers("/api/jobs/**").permitAll()
                 .requestMatchers("/api/companies/**").permitAll()
+                .requestMatchers("/api/secure/company-authentication/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers(HttpMethod.POST, "/api/secure/applications").hasRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName())
-                .requestMatchers(HttpMethod.PATCH, "/api/secure/applications/update-status").hasAnyRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
+                .requestMatchers(HttpMethod.PATCH, "/api/secure/applications/update-status").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers(HttpMethod.PUT, "/api/secure/candidates/{id}").hasRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName())
                 .requestMatchers(HttpMethod.GET, "/api/candidate-reviews/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/secure/candidate-reviews").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
@@ -107,7 +108,7 @@ public class SpringSecurityConfigs {
                 .requestMatchers(HttpMethod.GET, "/api/secure/is-following/**").hasRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName())
                 .requestMatchers(HttpMethod.GET, "/api/secure/followed-companies").hasRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName())
                 .requestMatchers(HttpMethod.GET, "/api/secure/followers/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
-                .requestMatchers(HttpMethod.DELETE, "/api/secure/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
+                .requestMatchers("/secure/company-authentication/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers("/api/secure/**").authenticated()
                 .requestMatchers("/candidates/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/applications/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
@@ -115,6 +116,7 @@ public class SpringSecurityConfigs {
                 .requestMatchers("/jobs/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/companies/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/report/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
+                .requestMatchers("/company-authentications/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/js/**").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
@@ -129,29 +131,29 @@ public class SpringSecurityConfigs {
                 .logout(logout -> logout
                 .logoutSuccessUrl("/login")
                 .permitAll());
-
+        
         return http.build();
     }
-
+    
     @Bean
     @Order(0)
     public StandardServletMultipartResolver multipartResolver() {
         return new StandardServletMultipartResolver();
     }
-
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
+        
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
+        
         return source;
     }
 }

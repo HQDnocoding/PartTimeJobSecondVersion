@@ -54,28 +54,22 @@ public class User implements Serializable {
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "username")
-    @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message = "Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     private String username;
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 200)
     @Column(name = "password")
-    @JsonIgnore
     private String password;
-
     @Basic(optional = false)
     @NotNull
     @Column(name = "register_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date registerDate;
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 40)
     @Column(name = "role")
     private String role;
-
     @Basic(optional = false)
     @NotNull
     @Column(name = "is_active")
@@ -89,7 +83,6 @@ public class User implements Serializable {
 //    @JsonBackReference
     private Company company;
 
-    
     @Transient
     private String clientPassword;
 
@@ -117,36 +110,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public Date getRegisterDate() {
         return registerDate;
     }
 
     public void setRegisterDate(Date registerDate) {
         this.registerDate = registerDate;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public boolean getIsActive() {
@@ -210,6 +179,30 @@ public class User implements Serializable {
      */
     public void setClientPassword(String clientPassword) {
         this.clientPassword = clientPassword;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 }

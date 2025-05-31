@@ -92,12 +92,12 @@ public class ApiCandidateController {
         try {
             Candidate updatedCandidate = this.candidateService.updateCadidate(candidate, principal, id);
             System.out.println(candidate.getAvatarFile());
-//            System.out.println(updatedCandidate.getAvatar());
-
             if (updatedCandidate != null) {
                 return ResponseEntity.ok(updatedCandidate);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        } catch (IllegalArgumentException i) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error : " + i.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error : " + e.getMessage());
