@@ -51,18 +51,41 @@ public class ApiFollowController {
             // Gửi email thông báo
             String candidateEmail = follow.getCandidateId().getUserId().getUsername();
             String companyName = follow.getCompanyId().getName();
-            String subject = "Bạn đã theo dõi " + companyName;
-            String body = String.format(
-                    "Chào %s,\n\nBạn đã theo dõi công ty %s thành công.\nBạn sẽ nhận được thông báo khi công ty đăng công việc mới.\n\n"
-                    + "Trân trọng,\nHệ thống tìm kiếm việc làm bán thời gian",
-                    follow.getCandidateId().getFullName(), companyName
-            );
-            emailService.sendEmail(candidateEmail, subject, body);
+            if (!isValidEmail(candidateEmail)) {
+                System.err.println("Invalid email address for follow notification: " + candidateEmail);
+            } else {
+                String subject = "Bạn đã theo dõi " + companyName;
+                String body = String.format(
+                        "Chào %s,\n\nBạn đã theo dõi công ty %s thành công.\nBạn sẽ nhận được thông báo khi công ty đăng công việc mới.\n\n"
+                        + "Trân trọng,\nHệ thống tìm kiếm việc làm bán thời gian",
+                        follow.getCandidateId().getFullName(), companyName
+                );
+                try {
+                    emailService.sendEmail(candidateEmail, subject, body);
+                    System.out.println("Follow email sent to: " + candidateEmail);
+                } catch (Exception e) {
+                    System.err.println("Failed to send follow email to " + candidateEmail + ": " + e.getMessage());
+                }
+            }
 
-            return new ResponseEntity<>(Map.of("message", "Theo dõi công ty thành công", "data", follow), HttpStatus.CREATED);
+            // Lấy số lượng người theo dõi
+            List<Follow> followers = followService.getFollowers(companyId);
+            int followerCount = followers.size();
+            boolean isFollowing = true;
+
+            System.out.println("Follow successful: companyId=" + companyId + ", candidateId=" + candidateId + ", followerCount=" + followerCount);
+
+            return new ResponseEntity<>(Map.of(
+                    "message", "Theo dõi công ty thành công",
+                    "data", follow,
+                    "followerCount", followerCount,
+                    "isFollowing", isFollowing
+            ), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
+            System.err.println("Follow error: " + e.getMessage());
             return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            System.err.println("Follow error: " + e.getMessage());
             return new ResponseEntity<>(Map.of("message", "Theo dõi công ty thất bại: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -74,20 +97,54 @@ public class ApiFollowController {
             Candidate candidate = candidateRepository.getCandidateById(candidateId);
             Company company = companyRepository.getCompanyById(companyId);
             followService.unfollowCompany(candidateId, companyId);
+
+            // Gửi email thông báo
             String candidateEmail = candidate.getUserId().getUsername();
             String companyName = company.getName();
-            String subject = "Bạn đã hủy theo dõi " + companyName;
-            String body = String.format(
-                    "Chào %s,\n\nBạn đã hủy theo dõi công ty %s thành công.\nBạn sẽ không nhận được thông báo khi công ty đăng công việc mới nữa.\n\nTrân trọng,\nHệ thống tìm kiếm việc làm bán thời gian",
-                    candidate.getFullName(), companyName
-            );
-            emailService.sendEmail(candidateEmail, subject, body);
-            return new ResponseEntity<>(Map.of("message", "Bỏ theo dõi công ty thành công"), HttpStatus.OK);
+            if (!isValidEmail(candidateEmail)) {
+                System.err.println("Invalid email address for unfollow notification: " + candidateEmail);
+            } else {
+                String subject = "Bạn đã hủy theo dõi " + companyName;
+                String body = String.format(
+                        "Chào %s,\n\nBạn đã hủy theo dõi công ty %s thành công.\nBạn sẽ không nhận được thông báo khi công ty đăng công việc mới nữa.\n\nTrân trọng,\nHệ thống tìm kiếm việc làm bán thời gian",
+                        candidate.getFullName(), companyName
+                );
+                try {
+                    emailService.sendEmail(candidateEmail, subject, body);
+                    System.out.println("Unfollow email sent to: " + candidateEmail);
+                } catch (Exception e) {
+                    System.err.println("Failed to send unfollow email to " + candidateEmail + ": " + e.getMessage());
+                }
+            }
+
+            // Lấy số lượng người theo dõi
+            List<Follow> followers = followService.getFollowers(companyId);
+            int followerCount = followers.size();
+            boolean isFollowing = false;
+
+            System.out.println("Unfollow successful: companyId=" + companyId + ", candidateId=" + candidateId + ", followerCount=" + followerCount);
+
+            return new ResponseEntity<>(Map.of(
+                    "message", "Bỏ theo dõi công ty thành công",
+                    "followerCount", followerCount,
+                    "isFollowing", isFollowing
+            ), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            System.err.println("Unfollow error: " + e.getMessage());
             return new ResponseEntity<>(Map.of("message", e.getMessage()), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            System.err.println("Unfollow error: " + e.getMessage());
             return new ResponseEntity<>(Map.of("message", "Bỏ theo dõi công ty thất bại: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // Hàm kiểm tra email hợp lệ
+    private boolean isValidEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email.matches(emailRegex);
     }
 
     @GetMapping("/secure/is-following/{companyId}")

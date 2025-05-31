@@ -5,7 +5,8 @@ import cookie from 'react-cookies';
 
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
-    const user = cookie.load('user') || null;
+    // const user = cookie.load('user') || null;
+    const user = useContext(MyUserContext);
 
     if (!user || !allowedRoles.includes(user?.role)) {
         return <Navigate to="/" />;

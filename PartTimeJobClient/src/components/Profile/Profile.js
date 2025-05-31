@@ -8,13 +8,11 @@ import { toast } from 'react-hot-toast';
 
 const Profile = () => {
   const user = useContext(MyUserContext);
-  // eslint-disable-next-line no-unused-vars
   const [jobs, setJobs] = useState();
-  // eslint-disable-next-line no-unused-vars
   const [applications, setApplications] = useState();
   const [followedCompanies, setFollowedCompanies] = useState([]);
   const [loadingFollowed, setLoadingFollowed] = useState(false);
-  const [unfollowLoading, setUnfollowLoading] = useState({}); // Thêm state để quản lý trạng thái unfollow cho từng công ty
+  const [unfollowLoading, setUnfollowLoading] = useState({});
   const navigate = useNavigate();
 
   const formatDate = (timestamp) => {
@@ -27,10 +25,8 @@ const Profile = () => {
 
   useEffect(() => {
     console.log(followedCompanies);
+  }, []);
 
-  }, [])
-
-  // Load danh sách ứng tuyển
   useEffect(() => {
     const loadApplications = async () => {
       try {
@@ -45,7 +41,6 @@ const Profile = () => {
     loadApplications();
   }, []);
 
-  // Load danh sách công ty đã theo dõi
   const loadFollowedCompanies = async () => {
     setLoadingFollowed(true);
     try {
@@ -69,7 +64,6 @@ const Profile = () => {
     }
   }, [user]);
 
-  // Xử lý bỏ theo dõi công ty
   const handleUnfollow = async (companyId) => {
     setUnfollowLoading((prev) => ({ ...prev, [companyId]: true }));
     try {
@@ -188,7 +182,7 @@ const Profile = () => {
                       <h5 className="mb-0">{follow.companyId.name}</h5>
                     </div>
                     <p className="text-muted">{`${follow.companyId.fullAddress || ''}, ${follow.companyId.district || ''}, ${follow.companyId.city || ''}`}</p>
-                    <div className="d-flex gap-2">
+                    <div className="d-flex gap-2 justify-content-center"> {/* Thêm justify-content-center để căn giữa */}
                       <Button
                         variant="primary"
                         onClick={() => handleViewCompany(follow.companyId.id)}

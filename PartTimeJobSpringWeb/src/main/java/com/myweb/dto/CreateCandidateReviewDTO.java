@@ -18,6 +18,9 @@ public class CreateCandidateReviewDTO {
     private Integer jobId;
 
     @NotNull
+    private Integer candidateId;
+
+    @NotNull
     @Min(1)
     @Max(5)
     private Integer rating;
@@ -41,6 +44,14 @@ public class CreateCandidateReviewDTO {
 
     public void setJobId(Integer jobId) {
         this.jobId = jobId;
+    }
+
+    public Integer getCandidateId() {
+        return candidateId;
+    }
+
+    public void setCandidateId(Integer candidateId) {
+        this.candidateId = candidateId;
     }
 
     public Integer getRating() {

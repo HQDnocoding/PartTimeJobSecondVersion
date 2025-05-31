@@ -11,6 +11,7 @@ import com.myweb.repositories.JobRepository;
 import com.myweb.utils.GeneralUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.JoinType;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,56 +83,174 @@ public class JobRepositoryImplement implements JobRepository {
         predicates.add(cb.equal(jobRoot.get("isActive"), true));
 
         if (params != null) {
+            // Xác định ngữ cảnh client hay admin
+            boolean isClient = "true".equalsIgnoreCase(params.get("isClient"));
+            System.out.println("isClient: " + isClient);
+
+            // Áp dụng status = "approved" cho client nếu không có tham số status
+            String status = params.get("status");
+            if (isClient && (status == null || status.isEmpty())) {
+                predicates.add(cb.equal(jobRoot.get("status"), "approved"));
+                System.out.println("Added status predicate: status = 'approved'");
+            } else if (status != null && !status.isEmpty()) {
+                predicates.add(cb.equal(jobRoot.get("status"), status));
+                System.out.println("Added status predicate: status = " + status);
+            }
+
+            // Từ khóa
             String keyword = params.get("keyword");
             if (keyword != null && !keyword.isEmpty()) {
                 predicates.add(cb.or(
                         cb.like(cb.lower(jobRoot.get("jobName")), "%" + keyword.toLowerCase() + "%"),
                         cb.like(cb.lower(jobRoot.get("description")), "%" + keyword.toLowerCase() + "%")
                 ));
+                System.out.println("Added keyword predicate: " + keyword);
             }
 
+            // Ngành nghề
             String majorId = params.get("majorId");
             if (majorId != null && !majorId.isEmpty()) {
-                predicates.add(cb.equal(jobRoot.join("majorJobCollection").join("majorId").get("id"), Integer.parseInt(majorId)));
+                try {
+                    predicates.add(cb.equal(jobRoot.join("majorJobCollection").join("majorId").get("id"), Integer.parseInt(majorId)));
+                    System.out.println("Added majorId predicate: " + majorId);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid majorId format: " + majorId);
+                }
             }
 
-            String salaryMin = params.get("salaryMin");
+            // Mức lương
+            String salaryMin = params.get("minSalary");
             if (salaryMin != null && !salaryMin.isEmpty()) {
-                predicates.add(cb.greaterThanOrEqualTo(jobRoot.get("salaryMin"), new BigInteger(salaryMin)));
+                try {
+                    predicates.add(cb.greaterThanOrEqualTo(jobRoot.get("salaryMin"), new BigInteger(salaryMin)));
+                    System.out.println("Added minSalary predicate: " + salaryMin);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid minSalary format: " + salaryMin);
+                }
             }
-            String salaryMax = params.get("salaryMax");
+            String salaryMax = params.get("maxSalary");
             if (salaryMax != null && !salaryMax.isEmpty()) {
-                predicates.add(cb.lessThanOrEqualTo(jobRoot.get("salaryMax"), new BigInteger(salaryMax)));
+                try {
+                    predicates.add(cb.lessThanOrEqualTo(jobRoot.get("salaryMax"), new BigInteger(salaryMax)));
+                    System.out.println("Added maxSalary predicate: " + salaryMax);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid maxSalary format: " + salaryMax);
+                }
             }
 
+            // Thành phố
             String city = params.get("city");
             if (city != null && !city.isEmpty()) {
                 city = normalizeLocation(city);
-                if (city != null) {
-                    predicates.add(cb.equal(cb.lower(jobRoot.get("city")), city.toLowerCase()));
-                }
+                predicates.add(cb.equal(cb.lower(jobRoot.get("city")), city.toLowerCase()));
+                System.out.println("Added city predicate: " + city);
             }
 
+            // Quận/Huyện
             String district = params.get("district");
             if (district != null && !district.isEmpty()) {
                 district = normalizeLocation(district);
-                if (district != null) {
-                    predicates.add(cb.equal(cb.lower(jobRoot.get("district")), district.toLowerCase()));
+                predicates.add(cb.equal(cb.lower(jobRoot.get("district")), district.toLowerCase()));
+                System.out.println("Added district predicate: " + district);
+            }
+
+            // Thời gian làm việc
+            String dayId = params.get("dayId");
+            if (dayId != null && !dayId.isEmpty()) {
+                try {
+                    predicates.add(cb.equal(jobRoot.join("dayJobCollection").join("dayId").get("id"), Integer.parseInt(dayId)));
+                    System.out.println("Added dayId predicate: " + dayId);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid dayId format: " + dayId);
                 }
             }
 
-            String dayId = params.get("dayId");
-            if (dayId != null && !dayId.isEmpty()) {
-                predicates.add(cb.equal(jobRoot.join("dayJobCollection").join("dayId").get("id"), Integer.parseInt(dayId)));
+            // Kinh nghiệm
+            String experience = params.get("experience");
+            if (experience != null && !experience.isEmpty()) {
+                try {
+                    predicates.add(cb.greaterThanOrEqualTo(jobRoot.get("experienceRequired"), Integer.parseInt(experience)));
+                    System.out.println("Added experience predicate: " + experience);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid experience format: " + experience);
+                }
             }
 
-            String status = params.get("status");
-            if (status != null && !status.isEmpty()) {
-                predicates.add(cb.equal(jobRoot.get("status"), status));
+            // Ngày đăng
+            String postedDays = params.get("postedDays");
+            if (postedDays != null && !postedDays.isEmpty()) {
+                try {
+                    LocalDateTime cutoffDate = LocalDateTime.now().minusDays(Integer.parseInt(postedDays));
+                    predicates.add(cb.greaterThanOrEqualTo(jobRoot.get("postedDate"), Timestamp.valueOf(cutoffDate)));
+                    System.out.println("Added postedDays predicate: " + postedDays);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid postedDays format: " + postedDays);
+                }
             }
 
+            // Lọc theo khoảng cách dựa trên tọa độ
+            String coordinates = params.get("coordinates");
+            String distanceStr = params.get("distance");
+            if (coordinates != null && !coordinates.isEmpty() && distanceStr != null && !distanceStr.isEmpty()) {
+                System.out.println("Coordinates: " + coordinates + ", Distance: " + distanceStr);
+
+                String[] coords = coordinates.split(",");
+                if (coords.length != 2) {
+                    System.err.println("Invalid coordinates format: " + coordinates);
+                    return predicates;
+                }
+
+                double userLng, userLat, distanceKm;
+                try {
+                    userLng = Double.parseDouble(coords[0]);
+                    userLat = Double.parseDouble(coords[1]);
+                    distanceKm = Double.parseDouble(distanceStr);
+                    System.out.println("Parsed - userLng: " + userLng + ", userLat: " + userLat + ", distanceKm: " + distanceKm);
+                } catch (NumberFormatException e) {
+                    System.err.println("Error parsing coordinates or distance: " + e.getMessage());
+                    return predicates;
+                }
+
+                // Công thức Haversine
+                double earthRadius = 6371.0; // Bán kính Trái Đất (km)
+                Expression<Double> latRad = cb.function("radians", Double.class, jobRoot.get("latitude"));
+                Expression<Double> lngRad = cb.function("radians", Double.class, jobRoot.get("longitude"));
+                Expression<Double> userLatRad = cb.literal(Math.toRadians(userLat));
+                Expression<Double> userLngRad = cb.literal(Math.toRadians(userLng));
+
+                Expression<Double> dLat = cb.diff(latRad, userLatRad);
+                Expression<Double> dLon = cb.diff(lngRad, userLngRad);
+
+                Expression<Double> a = cb.sum(
+                        cb.function("power", Double.class, cb.function("sin", Double.class, cb.quot(dLat, 2)), cb.literal(2.0)),
+                        cb.prod(
+                                cb.prod(
+                                        cb.function("cos", Double.class, userLatRad),
+                                        cb.function("cos", Double.class, latRad)
+                                ),
+                                cb.function("power", Double.class, cb.function("sin", Double.class, cb.quot(dLon, 2)), cb.literal(2.0))
+                        )
+                );
+
+                Expression<Double> c = cb.prod(
+                        cb.literal(2.0),
+                        cb.function("atan2", Double.class,
+                                cb.function("sqrt", Double.class, a),
+                                cb.function("sqrt", Double.class, cb.diff(cb.literal(1.0), a))
+                        )
+                );
+
+                Expression<Double> distance = cb.prod(cb.literal(earthRadius), c);
+
+                System.out.println("Adding distance predicate: distance <= " + distanceKm);
+                predicates.add(cb.le(distance, distanceKm));
+                predicates.add(cb.isNotNull(jobRoot.get("latitude")));
+                predicates.add(cb.isNotNull(jobRoot.get("longitude")));
+                System.out.println("Added predicates: distance <= " + distanceKm + ", latitude not null, longitude not null");
+            }
         }
 
+        System.out.println("Final predicates count: " + predicates.size());
         return predicates;
     }
 

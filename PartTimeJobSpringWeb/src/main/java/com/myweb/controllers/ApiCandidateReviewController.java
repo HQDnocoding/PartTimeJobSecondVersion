@@ -24,6 +24,7 @@ public class ApiCandidateReviewController {
 
     @PostMapping("/secure/candidate-reviews")
     public ResponseEntity<GetCandidateReviewDTO> createReview(@RequestBody CreateCandidateReviewDTO dto, Principal principal) {
+        System.out.println("Received request for creating review: " + dto.toString());
         GetCandidateReviewDTO review = reviewService.createReview(dto, principal);
         return new ResponseEntity<>(review, HttpStatus.CREATED);
     }

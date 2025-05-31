@@ -42,29 +42,33 @@ public class CandidateReview implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 200)
     @Column(name = "review")
     private String review;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "review_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date reviewDate;
-    
+
     @Column(name = "rating")
     private Integer rating;
-    
+
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Company companyId;
-    
+
     @JoinColumn(name = "job_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Job jobId;
+
+    @JoinColumn(name = "candidate_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Candidate candidateId;
 
     public CandidateReview() {
     }
@@ -127,6 +131,14 @@ public class CandidateReview implements Serializable {
         this.jobId = jobId;
     }
 
+    public Candidate getCandidateId() {
+        return candidateId;
+    }
+
+    public void setCandidateId(Candidate candidateId) {
+        this.candidateId = candidateId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -151,5 +163,5 @@ public class CandidateReview implements Serializable {
     public String toString() {
         return "com.myweb.pojo.CandidateReview[ id=" + id + " ]";
     }
-    
+
 }

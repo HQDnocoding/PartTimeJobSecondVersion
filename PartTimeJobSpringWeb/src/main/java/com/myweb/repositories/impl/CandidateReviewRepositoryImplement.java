@@ -132,4 +132,13 @@ public class CandidateReviewRepositoryImplement implements CandidateReviewReposi
         Double result = session.createQuery(query).getSingleResult();
         return result != null ? result : 0.0;
     }
+    
+    @Override
+    public CandidateReview findByCandidateIdAndJobId(Integer candidateId, Integer jobId) {
+        Session session = factory.getObject().getCurrentSession();
+        Query<CandidateReview> query = session.createNamedQuery("CandidateReview.findByCandidateIdAndJobId", CandidateReview.class);
+        query.setParameter("candidateId", candidateId);
+        query.setParameter("jobId", jobId);
+        return query.getSingleResultOrNull();
+    }
 }

@@ -32,10 +32,6 @@ export const endpoints = {
     'getCompanyByUserId': (id) => `/secure/companies/${id}/infor-by-userId`,
     'getCandidateByUserId': (id) => `/secure/candidates/${id}/infor-by-userId`,
     'jobs': '/jobs',
-    'jobDetail': (id) => `/jobs/${id}`,
-    'followCompany': (id) => `/secure/follow/${id}`,
-    'unfollowCompany': (id) => `/secure/unfollow/${id}`,
-    'isFollowing': (id) => `/secure/is-following/${id}`,
     'companies': '/companies',
     'companyDetail': (id) => `/companies/${id}`,
     'deleteJob': (id) => `/secure/jobs/${id}`,
@@ -43,7 +39,22 @@ export const endpoints = {
     'unfollowCompany': (id) => `/secure/unfollow/${id}`,
     'isFollowing': (id) => `/secure/is-following/${id}`,
     'followedCompanies': '/secure/followed-companies',
-    'followers': (id) => `/followers/${id}`,
+    'followers': (id) => `/secure/followers/${id}`,
+    
+    // Thêm endpoints cho CompanyReview
+    'createCompanyReview': '/secure/company-reviews',
+    'getCompanyReviews': (companyId) => `/company-reviews/company/${companyId}`,
+    'getCompanyReviewById': (id) => `/company-reviews/${id}`,
+    'updateCompanyReview': (id) => `/secure/company-reviews/${id}`,
+    'deleteCompanyReview': (id) => `/secure/company-reviews/${id}`,
+    'getCompanyAverageRating': (companyId) => `/company-reviews/company/${companyId}/average`,
+    // Thêm endpoints cho CandidateReview
+    'createCandidateReview': '/secure/candidate-reviews',
+    'getCandidateReviews': (candidateId) => `/candidate-reviews/candidate/${candidateId}`,
+    'getCandidateReviewById': (id) => `/candidate-reviews/${id}`,
+    'updateCandidateReview': (id) => `/secure/candidate-reviews/${id}`,
+    'deleteCandidateReview': (id) => `/secure/candidate-reviews/${id}`,
+    'getCandidateAverageRating': (candidateId) => `/candidate-reviews/candidate/${candidateId}/average`,
 };
 
 export const authApis = () => {

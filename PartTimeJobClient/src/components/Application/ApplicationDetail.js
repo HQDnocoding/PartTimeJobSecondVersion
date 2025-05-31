@@ -7,6 +7,9 @@ import './applicationDetail.scss';
 import { states } from '../../utils/rolesAndStatus';
 import { formatDate, formatSalary } from '../../utils/CommonUtils';
 import { MyChatBoxContext, MyReceiverContext, MyUserContext } from '../../configs/Contexts';
+import CandidateReview from '../Review/CandidateReview';
+import roles from '../../utils/rolesAndStatus';
+import cookie from 'react-cookies';
 
 const ApplicationDetail = () => {
     const { id } = useParams();
@@ -17,7 +20,6 @@ const ApplicationDetail = () => {
     const [error, setError] = useState(null);
     const { isOpen, setIsOpen } = useContext(MyChatBoxContext);
     const { receiver, setReceiver } = useContext(MyReceiverContext);
-
 
     const handleMessage = async () => {
         try {
@@ -36,9 +38,17 @@ const ApplicationDetail = () => {
         const loadApplication = async () => {
             setLoading(true);
             try {
+                // Kiểm tra token và user
+                if (!cookie.load('token') || !user) {
+                    toast.error('Vui lòng đăng nhập lại!');
+                    navigate('/login');
+                    return;
+                }
+
                 const res = await authApis().get(endpoints['getApplicationDetail'](id));
                 if (res.status === 200) {
                     setApplication(res.data.data);
+                    console.log('Application data:', res.data.data);
                 } else {
                     setError('Không thể tải chi tiết ứng tuyển');
                     toast.error('Không thể tải chi tiết ứng tuyển');
@@ -52,13 +62,12 @@ const ApplicationDetail = () => {
             }
         };
         loadApplication();
-    }, [id]);
-
+    }, [id, navigate, user]);
 
     useEffect(() => {
-        console.log(application);
-
-    }, [application])
+        console.log('Current application:', application);
+        console.log('Current user:', user);
+    }, [application, user]);
 
     const updateStatus = async (newStatus) => {
         setLoading(true);
@@ -130,11 +139,9 @@ const ApplicationDetail = () => {
 
     return (
         <Container className="application-detail-container py-5">
-
             <h2 className="mb-4 text-center">Thông tin đơn ứng tuyển</h2>
 
             <Row>
-
                 {/* Cột CV */}
                 <Col lg={6} className="mb-4">
                     <Card className="cv-card">
@@ -158,13 +165,9 @@ const ApplicationDetail = () => {
                 </Col>
 
                 {/* Cột thông tin cơ bản */}
-
                 <Col lg={6}>
-
                     <Card className="info-card">
-
                         <Card.Body>
-
                             <h5>Thông tin ứng viên</h5>
                             <Table borderless hover size="sm">
                                 <tbody>
@@ -182,7 +185,7 @@ const ApplicationDetail = () => {
                             <h5>Thông tin công việc</h5>
                             <Table borderless hover size="sm">
                                 <tbody>
-                                    <tr >
+                                    <tr>
                                         <td><strong>Tên công việc</strong></td>
                                         <td>{application.jobId?.jobName || 'N/A'}</td>
                                     </tr>
@@ -222,18 +225,20 @@ const ApplicationDetail = () => {
                                     </tr>
                                     <tr>
                                         <td><strong>Lời giới thiệu</strong></td>
-                                        <td> <pre style={{
-                                            margin: 0,
-                                            whiteSpace: 'pre-wrap',
-                                            wordBreak: 'break-word'
-                                        }}>
-                                            {application.message || 'Không có lời giới thiệu'}
-                                        </pre></td>
+                                        <td>
+                                            <pre style={{
+                                                margin: 0,
+                                                whiteSpace: 'pre-wrap',
+                                                wordBreak: 'break-word'
+                                            }}>
+                                                {application.message || 'Không có lời giới thiệu'}
+                                            </pre>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </Table>
 
-                            {application.status === states['waiting for approving'] && (
+                            {application.status === states['waiting for approving'] && user?.role === roles.company && (
                                 <div className="action-buttons mt-4 text-center">
                                     <Button
                                         variant="success"
@@ -252,10 +257,11 @@ const ApplicationDetail = () => {
                                     </Button>
                                 </div>
                             )}
+                            {/* Tích hợp CandidateReview */}
+                            <CandidateReview application={application} userRole={user?.role} roles={roles} />
                         </Card.Body>
-                        <Card.Footer className=" text-center">
+                        <Card.Footer className="text-center">
                             <div className="action-buttons mt-4 text-center">
-
                                 <Button variant="primary" className="me-2" onClick={handleBack}>
                                     Quay lại
                                 </Button>
@@ -267,7 +273,6 @@ const ApplicationDetail = () => {
                                     Nhắn tin
                                 </Button>
                             </div>
-
                         </Card.Footer>
                     </Card>
                 </Col>

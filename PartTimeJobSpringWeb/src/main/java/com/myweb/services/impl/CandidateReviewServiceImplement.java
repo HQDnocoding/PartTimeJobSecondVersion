@@ -2,18 +2,8 @@ package com.myweb.services.impl;
 
 import com.myweb.dto.CreateCandidateReviewDTO;
 import com.myweb.dto.GetCandidateReviewDTO;
-import com.myweb.pojo.Application;
-import com.myweb.pojo.Candidate;
-import com.myweb.pojo.CandidateReview;
-import com.myweb.pojo.Company;
-import com.myweb.pojo.Job;
-import com.myweb.pojo.User;
-import com.myweb.repositories.ApplicationRepository;
-import com.myweb.repositories.CandidateRepository;
-import com.myweb.repositories.CandidateReviewRepository;
-import com.myweb.repositories.CompanyRepository;
-import com.myweb.repositories.JobRepository;
-import com.myweb.repositories.UserRepository;
+import com.myweb.pojo.*;
+import com.myweb.repositories.*;
 import com.myweb.services.CandidateReviewService;
 import com.myweb.utils.GeneralUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -39,51 +28,58 @@ public class CandidateReviewServiceImplement implements CandidateReviewService {
     private JobRepository jobRepository;
 
     @Autowired
-    private ApplicationRepository applicationRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CandidateRepository candidateRepository;
 
     @Override
     public GetCandidateReviewDTO createReview(CreateCandidateReviewDTO dto, Principal principal) {
+        System.out.println("DTO: " + dto);
+        System.out.println("Principal: " + principal.getName());
+
         if (dto == null) {
-            throw new IllegalArgumentException("Review data is required.");
+            throw new IllegalArgumentException("Dữ liệu đánh giá là bắt buộc.");
         }
 
         User user = userRepository.getUserByUsername(principal.getName());
+        System.out.println("User ID: " + user.getId() + ", Role: " + user.getRole());
         if (!user.getRole().equals(GeneralUtils.Role.ROLE_COMPANY.toString())) {
-            throw new SecurityException("Only companies can create candidate reviews.");
+            throw new SecurityException("Chỉ công ty mới có thể tạo đánh giá ứng viên.");
         }
 
         Company company = companyRepository.getCompanyById(dto.getCompanyId());
+        System.out.println("Company User ID: " + (company != null ? company.getUserId().getId() : "null"));
         Job job = jobRepository.getJobById(dto.getJobId());
+        System.out.println("Job Company ID: " + (job != null ? job.getCompanyId().getId() : "null"));
+        Candidate candidate = candidateRepository.getCandidateById(dto.getCandidateId());
 
-        if (company == null || job == null) {
-            throw new IllegalArgumentException("Invalid company or job.");
+        if (company == null || job == null || candidate == null) {
+            throw new IllegalArgumentException("Công ty, công việc hoặc ứng viên không hợp lệ.");
         }
 
         if (!company.getUserId().getId().equals(user.getId())) {
-            throw new SecurityException("You are not authorized to create this review.");
+            throw new SecurityException("Bạn không có quyền tạo đánh giá này.");
         }
 
         if (!job.getCompanyId().getId().equals(company.getId())) {
-            throw new IllegalArgumentException("Job does not belong to this company.");
+            throw new IllegalArgumentException("Công việc không thuộc công ty này.");
         }
 
-        List<Application> applications = applicationRepository.findByJobIdAndStatus(
-            dto.getJobId(), GeneralUtils.Status.approved.toString()
-        );
-        if (applications.isEmpty()) {
-            throw new IllegalArgumentException("No approved application found for this job.");
+        // Kiểm tra xem đã có đánh giá cho ứng viên và công việc này chưa
+        CandidateReview existingReview = reviewRepository.findByCandidateIdAndJobId(dto.getCandidateId(), dto.getJobId());
+        if (existingReview != null) {
+            throw new IllegalArgumentException("Đã tồn tại đánh giá cho ứng viên này trong công việc này.");
         }
 
         if (dto.getRating() < 1 || dto.getRating() > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+            throw new IllegalArgumentException("Điểm đánh giá phải từ 1 đến 5.");
         }
 
         CandidateReview review = new CandidateReview();
         review.setCompanyId(company);
         review.setJobId(job);
+        review.setCandidateId(candidate);
         review.setRating(dto.getRating());
         review.setReview(dto.getReview());
         review.setReviewDate(new Date());
@@ -101,7 +97,7 @@ public class CandidateReviewServiceImplement implements CandidateReviewService {
     public GetCandidateReviewDTO getReviewById(Integer id) {
         CandidateReview review = reviewRepository.getReviewById(id);
         if (review == null) {
-            throw new IllegalArgumentException("Review not found.");
+            throw new IllegalArgumentException("Không tìm thấy đánh giá.");
         }
         return new GetCandidateReviewDTO(review);
     }
@@ -109,27 +105,28 @@ public class CandidateReviewServiceImplement implements CandidateReviewService {
     @Override
     public GetCandidateReviewDTO updateReview(Integer id, CreateCandidateReviewDTO dto, Principal principal) {
         if (dto == null) {
-            throw new IllegalArgumentException("Review data is required.");
+            throw new IllegalArgumentException("Dữ liệu đánh giá là bắt buộc.");
         }
 
         User user = userRepository.getUserByUsername(principal.getName());
         CandidateReview review = reviewRepository.getReviewById(id);
 
         if (review == null) {
-            throw new IllegalArgumentException("Review not found.");
+            throw new IllegalArgumentException("Không tìm thấy đánh giá.");
         }
 
         if (!user.getRole().equals(GeneralUtils.Role.ROLE_COMPANY.toString()) ||
             !review.getCompanyId().getUserId().getId().equals(user.getId())) {
-            throw new SecurityException("You are not authorized to update this review.");
+            throw new SecurityException("Bạn không có quyền cập nhật đánh giá này.");
         }
 
         if (dto.getRating() < 1 || dto.getRating() > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+            throw new IllegalArgumentException("Điểm đánh giá phải từ 1 đến 5.");
         }
 
         review.setRating(dto.getRating());
         review.setReview(dto.getReview());
+        review.setReviewDate(new Date());
         review = reviewRepository.addOrUpdateReview(review);
         return new GetCandidateReviewDTO(review);
     }
@@ -140,14 +137,14 @@ public class CandidateReviewServiceImplement implements CandidateReviewService {
         CandidateReview review = reviewRepository.getReviewById(id);
 
         if (review == null) {
-            throw new IllegalArgumentException("Review not found.");
+            throw new IllegalArgumentException("Không tìm thấy đánh giá.");
         }
 
         if (!user.getRole().equals(GeneralUtils.Role.ROLE_COMPANY.toString()) &&
             !user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString()) ||
             (!user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString()) &&
              !review.getCompanyId().getUserId().getId().equals(user.getId()))) {
-            throw new SecurityException("You are not authorized to delete this review.");
+            throw new SecurityException("Bạn không có quyền xóa đánh giá này.");
         }
 
         reviewRepository.deleteReview(id);

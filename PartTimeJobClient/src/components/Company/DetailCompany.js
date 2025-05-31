@@ -6,6 +6,7 @@ import { Card, Spinner, Button, Carousel, Col, Row } from 'react-bootstrap';
 import { MyChatBoxContext, MyReceiverContext } from '../../configs/Contexts';
 import { toast } from 'react-hot-toast';
 import cookie from 'react-cookies';
+import CompanyReview from '../Review/CompanyReview'; // Import CompanyReview
 
 // Hàm kiểm tra URL hình ảnh hợp lệ
 const isValidImageUrl = async (url) => {
@@ -40,11 +41,9 @@ const DetailCompany = () => {
       const res = await APIs.get(endpoints.getDetailCompany(id));
       if (res.status === 200) {
         setCompany(res.data);
-        // Thử lấy followerCount từ followCollection
         if (res.data.followCollection) {
           setFollowerCount(res.data.followCollection.length || 0);
         } else {
-          // Dự phòng: gọi /followers/{id}
           await loadFollowerCount();
         }
         const images = res.data.imageWorkplaceCollection || [];
@@ -63,7 +62,6 @@ const DetailCompany = () => {
       console.error('Lỗi khi tải thông tin công ty:', e);
       setErrors(['Lỗi hệ thống xảy ra']);
       toast.error('Lỗi khi tải thông tin công ty!');
-      // Dự phòng: thử lấy followerCount
       await loadFollowerCount();
     } finally {
       setLoading(false);
@@ -80,7 +78,6 @@ const DetailCompany = () => {
     } catch (e) {
       console.error('Lỗi khi tải số lượng người theo dõi:', e);
       setFollowerCount(0);
-      // Không hiển thị toast để tránh spam
     }
   };
 
@@ -94,89 +91,98 @@ const DetailCompany = () => {
     }
   };
 
-  useEffect(() => {
-    const loadJobs = async () => {
-      setJobLoading(true);
-      try {
-        const res = await APIs.get(endpoints.getJobsForCompany(id));
-        if (res.status === 200) {
-          const jobList = res.data || [];
-          const mappedJobs = jobList.map((job) => {
-            const majorJob = job.majorJobCollection?.[0];
-            const dayJobs = job.dayJobCollection || [];
-            return {
-              ...job,
-              companyName: job.companyId?.name || "N/A",
-              majorName: majorJob?.majorId?.name || "Chưa xác định",
-              dayNames: dayJobs.map((dj) => dj.dayId?.name).filter((name) => name) || [],
-              fullAddress: job.fullAddress || "Không có địa chỉ",
-              district: job.district || "Không xác định",
-              city: job.city || "Không xác định",
-            };
-          });
-          setJobs(Array.isArray(mappedJobs) ? mappedJobs : []);
-          if (mappedJobs.length === 0) {
-            console.warn('Công ty chưa có công việc nào');
-          }
-        } else {
-          setErrors(['Không thể tải danh sách công việc']);
-          toast.error('Không thể tải công việc!');
-          errorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Hàm tải công việc
+  const loadJobs = async () => {
+    setJobLoading(true);
+    try {
+      const res = await APIs.get(endpoints.getJobsForCompany(id));
+      if (res.status === 200) {
+        const jobList = res.data || [];
+        const mappedJobs = jobList.map((job) => {
+          const majorJob = job.majorJobCollection?.[0];
+          const dayJobs = job.dayJobCollection || [];
+          return {
+            ...job,
+            companyName: job.companyId?.name || "N/A",
+            majorName: majorJob?.majorId?.name || "Chưa xác định",
+            dayNames: dayJobs.map((dj) => dj.dayId?.name).filter((name) => name) || [],
+            fullAddress: job.fullAddress || "Không có địa chỉ",
+            district: job.district || "Không xác định",
+            city: job.city || "Không xác định",
+          };
+        });
+        setJobs(Array.isArray(mappedJobs) ? mappedJobs : []);
+        if (mappedJobs.length === 0) {
+          console.warn('Công ty chưa có công việc nào');
         }
-      } catch (e) {
-        console.error('Lỗi khi tải công việc:', e);
-        toast.error('Lỗi khi tải công việc!');
-      } finally {
-        setJobLoading(false);
+      } else {
+        setErrors(['Không thể tải danh sách công việc']);
+        toast.error('Không thể tải công việc!');
+        errorRef.current?.scrollIntoView({ behavior: 'smooth' });
       }
-    };
+    } catch (e) {
+      console.error('Lỗi khi tải công việc:', e);
+      toast.error('Lỗi khi tải công việc!');
+    } finally {
+      setJobLoading(false);
+    }
+  };
 
+  useEffect(() => {
     const fetchData = async () => {
       await Promise.all([loadCompany(), loadJobs()]);
       if (cookie.load('token')) {
         await checkFollowStatus();
       }
     };
-
     fetchData();
   }, [id]);
 
   const handleFollow = async () => {
     if (followLoading || !cookie.load('token')) {
-      if (!cookie.load('token')) {
-        toast.error('Vui lòng đăng nhập để theo dõi công ty!');
+        if (!cookie.load('token')) {
+            toast.error('Vui lòng đăng nhập để theo dõi công ty!');
+            nav('/login');
+            return;
+        }
         return;
-      }
-      return;
     }
     setFollowLoading(true);
     try {
-      if (!followed) {
-        const res = await authApis().post(endpoints.followCompany(id));
-        if (res.status === 200 || res.status === 201) {
-          setFollowed(true);
-          await loadCompany(); // Cập nhật followCollection hoặc followerCount
-          toast.success('Theo dõi công ty thành công!');
+        if (!followed) {
+            const res = await authApis().post(endpoints.followCompany(id));
+            if (res.status === 200 || res.status === 201) {
+                setFollowed(res.data.isFollowing); // Lấy từ response
+                setFollowerCount(res.data.followerCount); // Lấy từ response
+                toast.success('Theo dõi công ty thành công!');
+            }
+        } else {
+            const res = await authApis().delete(endpoints.unfollowCompany(id));
+            if (res.status === 200) {
+                setFollowed(res.data.isFollowing); // Lấy từ response
+                setFollowerCount(res.data.followerCount); // Lấy từ response
+                toast.success('Bỏ theo dõi công ty thành công!');
+            }
         }
-      } else {
-        const res = await authApis().delete(endpoints.unfollowCompany(id));
-        if (res.status === 200) {
-          setFollowed(false);
-          await loadCompany(); // Cập nhật followCollection hoặc followerCount
-          toast.success('Bỏ theo dõi công ty thành công!');
-        }
-      }
     } catch (e) {
-      console.error('Lỗi khi theo dõi/bỏ theo dõi:', e);
-      toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+        console.error('Lỗi khi theo dõi/bỏ theo dõi:', e);
+        if (e.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!');
+            cookie.remove('token');
+            nav('/login');
+        } else {
+            toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+            // Fallback: Gọi lại loadFollowerCount nếu API thất bại
+            await loadFollowerCount();
+        }
     } finally {
-      setFollowLoading(false);
+        setFollowLoading(false);
     }
-  };
+};
 
   const handleMessage = async () => {
     try {
-      const res = await authApis().get(endpoints.getUserIdFromCompanyId(id));
+      const res = await APIs.get(endpoints.getUserIdFromCompanyId(id));
       if (res.status === 200) {
         setReceiver(res.data);
         setIsOpen(true);
@@ -242,6 +248,9 @@ const DetailCompany = () => {
                     <i className="bi bi-chat me-1"></i> Nhắn tin
                   </Button>
                 </div>
+                <p className="card-text-highlight mt-3 text-center">
+                  <strong>Người theo dõi:</strong> {followerCount} người
+                </p>
               </div>
               <div className="col-md-9">
                 <h1 className="company-name">{company.name || 'Tên công ty'}</h1>
@@ -262,7 +271,7 @@ const DetailCompany = () => {
             </div>
 
             <div className="row mt-4">
-              <div className="col-12">
+              <div className="col-12 text-start">
                 <h2 className="section-title">Giới thiệu công ty</h2>
                 <p className="company-description">
                   {company.selfDescription || 'Công ty chưa cung cấp thông tin mô tả.'}
@@ -270,22 +279,9 @@ const DetailCompany = () => {
               </div>
             </div>
 
-            <div className="row mt-4">
-              <div className="col-12">
-                <h2 className="section-title">Thông tin bổ sung</h2>
-                <p className="card-text-highlight">
-                  <strong>Người theo dõi:</strong> {followerCount} người
-                </p>
-                <p className="card-text-highlight">
-                  <strong>Đánh giá:</strong>{" "}
-                  {company.candidateReviewCollection?.length || 0} đánh giá
-                </p>
-              </div>
-            </div>
-
             {validImages.length > 0 && (
               <div className="row mt-4">
-                <div className="col-12">
+                <div className="col-12 text-start">
                   <h2 className="section-title">Hình ảnh nơi làm việc</h2>
                   <Carousel>
                     {validImages.map((img, index) => (
@@ -303,65 +299,73 @@ const DetailCompany = () => {
                 </div>
               </div>
             )}
-          </div>
 
-          <div className="jobs-section mt-5">
-            <h2 className="section-title">Danh sách công việc</h2>
-            {jobLoading ? (
-              <div className="text-center">
-                <Spinner animation="border" size="sm" /> Đang tải danh sách công việc...
+            <div className="jobs-section mt-5">
+              <div className="col-12 text-start">
+                <h2 className="section-title">Danh sách công việc</h2>
+                {jobLoading ? (
+                  <div className="text-center">
+                    <Spinner animation="border" size="sm" /> Đang tải danh sách công việc...
+                  </div>
+                ) : jobs.length === 0 ? (
+                  <p className="text-muted">Hiện tại công ty chưa có công việc nào.</p>
+                ) : (
+                  <Row>
+                    {jobs.map((job) => (
+                      <Col key={job.id} md={6} className="mb-4">
+                        <Card className="card-job shadow-sm">
+                          <Card.Body className="card-body-custom text-start">
+                            <Card.Title className="card-title">{job.jobName || 'Tên công việc không xác định'}</Card.Title>
+                            <Card.Text className="card-text card-text-highlight">
+                              <strong>Mức lương:</strong> {job.salaryMin && job.salaryMax
+                                ? `${job.salaryMin.toLocaleString("vi-VN")} - ${job.salaryMax.toLocaleString("vi-VN")} VNĐ`
+                                : "Thỏa thuận"}
+                            </Card.Text>
+                            {(job.fullAddress !== "Không có địa chỉ" || job.district !== "Không xác định" || job.city !== "Không xác định") && (
+                              <Card.Text className="card-text">
+                                <strong>Địa điểm:</strong> {job.fullAddress !== "Không có địa chỉ" ? job.fullAddress : ""}{job.district !== "Không xác định" ? `, ${job.district}` : ""}{job.city !== "Không xác định" ? `, ${job.city}` : ""}
+                              </Card.Text>
+                            )}
+                            <Card.Text className="card-text">
+                              <strong>Kinh nghiệm:</strong> {job.experienceRequired
+                                ? `${job.experienceRequired} năm`
+                                : "Không yêu cầu"}
+                            </Card.Text>
+                            <Card.Text className="card-text card-text-highlight">
+                              <strong>Độ tuổi:</strong>{" "}
+                              {job.ageFrom && job.ageTo
+                                ? `${job.ageFrom} - ${job.ageTo} tuổi`
+                                : "Không yêu cầu"}
+                            </Card.Text>
+                            <Card.Text className="card-text">
+                              <strong>Thời gian làm việc:</strong> {(job.dayNames || []).length > 0 ? job.dayNames.join(", ") : "Chưa xác định"}
+                            </Card.Text>
+                            <Card.Text className="card-text">
+                              <strong>Ngày đăng:</strong> {new Date(job.postedDate).toLocaleDateString("vi-VN")}
+                            </Card.Text>
+                            <div className="d-grid gap-1 mt-2">
+                              <Button
+                                variant="primary"
+                                onClick={() => handleViewJobDetail(job.id)}
+                                className="rounded-pill"
+                              >
+                                Xem chi tiết
+                              </Button>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                )}
               </div>
-            ) : jobs.length === 0 ? (
-              <p className="text-muted">Hiện tại công ty chưa có công việc nào.</p>
-            ) : (
-              <Row>
-                {jobs.map((job) => (
-                  <Col key={job.id} md={6} className="mb-4">
-                    <Card className="card-job shadow-sm">
-                      <Card.Body className="card-body-custom text-start">
-                        <Card.Title className="card-title">{job.jobName || 'Tên công việc không xác định'}</Card.Title>
-                        <Card.Text className="card-text card-text-highlight">
-                          <strong>Mức lương:</strong> {job.salaryMin && job.salaryMax
-                            ? `${job.salaryMin.toLocaleString("vi-VN")} - ${job.salaryMax.toLocaleString("vi-VN")} VNĐ`
-                            : "Thỏa thuận"}
-                        </Card.Text>
-                        {(job.fullAddress !== "Không có địa chỉ" || job.district !== "Không xác định" || job.city !== "Không xác định") && (
-                          <Card.Text className="card-text">
-                            <strong>Địa điểm:</strong> {job.fullAddress !== "Không có địa chỉ" ? job.fullAddress : ""}{job.district !== "Không xác định" ? `, ${job.district}` : ""}{job.city !== "Không xác định" ? `, ${job.city}` : ""}
-                          </Card.Text>
-                        )}
-                        <Card.Text className="card-text">
-                          <strong>Kinh nghiệm:</strong> {job.experienceRequired
-                            ? `${job.experienceRequired} năm`
-                            : "Không yêu cầu"}
-                        </Card.Text>
-                        <Card.Text className="card-text card-text-highlight">
-                          <strong>Độ tuổi:</strong>{" "}
-                          {job.ageFrom && job.ageTo
-                            ? `${job.ageFrom} - ${job.ageTo} tuổi`
-                            : "Không yêu cầu"}
-                        </Card.Text>
-                        <Card.Text className="card-text">
-                          <strong>Thời gian làm việc:</strong> {(job.dayNames || []).length > 0 ? job.dayNames.join(", ") : "Chưa xác định"}
-                        </Card.Text>
-                        <Card.Text className="card-text">
-                          <strong>Ngày đăng:</strong> {new Date(job.postedDate).toLocaleDateString("vi-VN")}
-                        </Card.Text>
-                        <div className="d-grid gap-1 mt-2">
-                          <Button
-                            variant="primary"
-                            onClick={() => handleViewJobDetail(job.id)}
-                            className="rounded-pill"
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            )}
+            </div>
+
+            <div className="row mt-5">
+              <div className="col-12 text-start">
+                <CompanyReview companyId={id} /> {/* Gọi CompanyReview */}
+              </div>
+            </div>
           </div>
         </>
       ) : (

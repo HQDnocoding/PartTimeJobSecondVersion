@@ -31,9 +31,6 @@
         align-items: center;
         color: #333;
 
-
-
-
         .profile-img {
             width: 30px;
             height: 30px;
@@ -116,6 +113,41 @@
             box-shadow: none;
         }
     }
+
+    // Thêm style cho notification badge
+    .notification-badge {
+        animation: pulse 1.5s infinite;
+    }
+
+    // Thêm style cho notification dropdown
+    .notification-dropdown {
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 14px;
+
+        .font-weight-bold {
+            font-weight: 600;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @media (max-width: 991px) {
@@ -134,6 +166,12 @@
 
         .dropdown-menu {
             margin: 0 15px;
+        }
+
+        .notification-dropdown {
+            width: 100%;
+            right: auto;
+            left: 15px;
         }
     }
 }
