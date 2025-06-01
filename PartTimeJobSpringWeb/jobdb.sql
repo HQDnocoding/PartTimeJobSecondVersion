@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: jobdb
 -- ------------------------------------------------------
--- Server version	9.1.0
+-- Server version	8.4.5
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -26,7 +26,7 @@ CREATE TABLE `application` (
   `id` int NOT NULL AUTO_INCREMENT,
   `curriculum_vitae` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `applied_date` datetime NOT NULL,
-  `message` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `status` enum('approved','pending','refused') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `candidate_id` int NOT NULL,
   `job_id` int NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE `application` (
   KEY `job_id` (`job_id`),
   CONSTRAINT `application_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`id`) ON DELETE CASCADE,
   CONSTRAINT `application_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +44,7 @@ CREATE TABLE `application` (
 
 LOCK TABLES `application` WRITE;
 /*!40000 ALTER TABLE `application` DISABLE KEYS */;
-INSERT INTO `application` VALUES (1,'cv1.pdf','2025-04-26 12:00:00','Tôi rất quan tâm đến vị trí này.','pending',1,1),(2,'cv2.pdf','2025-04-26 12:30:00','Tôi có kinh nghiệm phù hợp với công việc này.','pending',2,2),(3,'cv3.pdf','2025-04-26 13:00:00','Tôi muốn thử sức với công việc này.','pending',3,3),(4,'cv4.pdf','2025-04-26 13:30:00','Tôi đáp ứng đầy đủ yêu cầu công việc.','pending',4,4),(5,'cv5.pdf','2025-04-26 14:00:00','Tôi rất hứng thú với vị trí này.','pending',5,5),(6,'cv6.pdf','2025-04-26 14:30:00','Tôi có kỹ năng phù hợp.','pending',6,6),(7,'cv7.pdf','2025-04-26 15:00:00','Tôi muốn gia nhập đội ngũ của bạn.','pending',7,7),(8,'cv8.pdf','2025-04-26 15:30:00','Tôi có kinh nghiệm trong lĩnh vực này.','pending',8,8),(9,'cv9.pdf','2025-04-26 16:00:00','Tôi đáp ứng yêu cầu công việc.','pending',9,9),(10,'cv10.pdf','2025-04-26 16:30:00','Tôi rất quan tâm đến vị trí bác sĩ.','pending',10,10),(11,'cv11.pdf','2025-04-26 17:00:00','Tôi muốn thử sức với công việc này.','pending',11,11),(12,'cv12.pdf','2025-04-26 17:30:00','Tôi có kinh nghiệm thiết kế thời trang.','pending',12,12),(13,'cv13.pdf','2025-04-26 18:00:00','Tôi đáp ứng yêu cầu công việc.','pending',13,13),(14,'cv14.pdf','2025-04-26 18:30:00','Tôi có kỹ năng lập trình tốt.','pending',14,14),(15,'cv15.pdf','2025-04-26 19:00:00','Tôi muốn làm việc trong ngành tài chính.','pending',15,15),(16,'cv16.pdf','2025-04-26 19:30:00','Tôi có kinh nghiệm trong ngành kiến trúc.','pending',16,16),(17,'cv17.pdf','2025-04-26 20:00:00','Tôi đáp ứng yêu cầu công việc y tá.','pending',17,17),(18,'cv18.pdf','2025-04-26 20:30:00','Tôi muốn làm việc trong ngành du lịch.','pending',18,18),(19,'cv19.pdf','2025-04-26 21:00:00','Tôi có kinh nghiệm thiết kế đồ họa.','pending',19,19),(20,'cv20.pdf','2025-04-26 21:30:00','Tôi muốn làm việc trong ngành nông nghiệp.','pending',20,20);
+INSERT INTO `application` VALUES (13,'https://res.cloudinary.com/dmbvjjg5a/image/upload/a-customised-curve-cv_qctrqp.pdf','2025-04-29 01:51:56','Dear [Hiring Manager\'s Name / HR Department],\n\nMy name is [Full Name], and I am writing to express my sincere interest in the position of [Job Title] at [Company Name]. I hold a degree in [Your Major] from [University Name], and I am eager to apply my knowledge and passion in the field of [Industry/Field] to contribute to your esteemed organization.\n\nWith the relevant skills, a strong work ethic, and a desire to grow professionally, I believe I would be a valuable addition to your team.','approved',3,1),(19,'https://res.cloudinary.com/dmbvjjg5a/image/upload/a-customised-curve-cv_qctrqp.pdf','2025-04-29 01:51:56',NULL,'refused',7,2),(24,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746260640/jh7gkumzfzhb8fpnqg2r.pdf','2025-05-03 00:00:00','huhu\r\n','refused',28,8),(26,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747130630/fzewj1cu5y5klr122bmq.pdf','2025-05-13 17:03:44',NULL,'refused',27,1),(27,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747134793/kcx71mi1o6qpzytjooss.pdf','2025-05-13 18:13:07',NULL,'refused',27,1),(28,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747135054/iiqxr241hs0fujo1ikux.pdf','2025-05-13 18:17:29',NULL,'refused',27,1),(29,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747135142/nmldjdnzixpzwgkosrmv.pdf','2025-05-13 18:18:57',NULL,'approved',27,1),(31,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748237243/fmemzikgypnhgtwyowrc.pdf','2025-05-26 00:00:00','','refused',27,3),(32,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748237273/fsui0ngshnukb6rc1iei.pdf','2025-05-26 00:00:00','','approved',27,1),(36,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748346236/evesvsfx4xnltckofpje.pdf','2025-05-27 18:43:57','','approved',37,3),(37,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748352158/n1bw6ifob0j2ii140l4w.pdf','2025-05-27 20:22:39',NULL,'approved',37,2),(38,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537326/n4cuqebckjbcum5q7nxl.pdf','2025-05-29 23:49:07',NULL,'approved',40,2),(39,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537434/rjrr8ex8ljzqvbretfor.pdf','2025-05-29 23:50:35',NULL,'pending',40,6),(40,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537997/bpazvroeijnw1rbtrdkr.pdf','2025-05-30 00:33:28',NULL,'pending',41,3),(41,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537997/bpazvroeijnw1rbtrdkr.pdf','2025-05-30 00:36:30',NULL,'approved',41,28),(42,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537997/bpazvroeijnw1rbtrdkr.pdf','2025-05-31 01:13:52',NULL,'approved',41,28),(43,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748697830/c9s97oomedgyxsikplf7.pdf','2025-05-31 00:00:00','','approved',3,6),(44,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748697930/x7ggzqbjz8ykhtuev2g8.pdf','2025-05-31 00:00:00','','approved',7,27),(45,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748707473/kt0cdgelrcenyx0hwcm9.pdf','2025-05-31 23:04:29',NULL,'pending',27,1),(46,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748745445/ijcclmggmeh86mfxcvgz.pdf','2025-06-01 09:37:24',NULL,'pending',37,25);
 /*!40000 ALTER TABLE `application` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -57,21 +57,19 @@ DROP TABLE IF EXISTS `candidate`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `candidate` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `full_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `date_of_birth` date NOT NULL,
-  `city` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `city` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `self_description` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `curriculum_vitae` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `user_id` int NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `phone` (`phone`),
   UNIQUE KEY `user_id` (`user_id`),
+  UNIQUE KEY `phone` (`phone`),
   CONSTRAINT `candidate_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -80,7 +78,7 @@ CREATE TABLE `candidate` (
 
 LOCK TABLES `candidate` WRITE;
 /*!40000 ALTER TABLE `candidate` DISABLE KEYS */;
-INSERT INTO `candidate` VALUES (1,'Nguyễn Văn An','candidate1@example.com','1995-05-15','Hà Nội','avatar1.jpg','Tôi là người chăm chỉ và có động lực làm việc.','0123456781','cv1.pdf',4),(2,'Trần Thị Bình','candidate2@example.com','1998-03-22','Hồ Chí Minh','avatar2.jpg','Tôi có kinh nghiệm trong lĩnh vực dịch vụ khách hàng.','0123456782','cv2.pdf',5),(3,'Lê Minh Châu','candidate3@example.com','1996-07-10','Đà Nẵng','avatar3.jpg','Tôi đam mê công nghệ và lập trình.','0123456783','cv3.pdf',6),(4,'Phạm Quốc Dũng','candidate4@example.com','1997-09-12','Hà Nội','avatar4.jpg','Tôi có kỹ năng giao tiếp tốt.','0123456784','cv4.pdf',7),(5,'Hoàng Thị E','candidate5@example.com','1999-01-25','Hải Phòng','avatar5.jpg','Tôi yêu thích công việc sáng tạo.','0123456785','cv5.pdf',8),(6,'Ngô Văn F','candidate6@example.com','1994-11-30','Cần Thơ','avatar6.jpg','Tôi có kinh nghiệm trong ngành giáo dục.','0123456786','cv6.pdf',9),(7,'Đỗ Thị G','candidate7@example.com','1993-04-18','Hà Nội','avatar7.jpg','Tôi là người năng động và nhiệt huyết.','0123456787','cv7.pdf',10),(8,'Vũ Minh H','candidate8@example.com','1992-06-20','Hồ Chí Minh','avatar8.jpg','Tôi có kinh nghiệm quản lý sự kiện.','0123456788','cv8.pdf',11),(9,'Bùi Thị I','candidate9@example.com','1991-08-15','Đà Nẵng','avatar9.jpg','Tôi yêu thích công việc liên quan đến marketing.','0123456789','cv9.pdf',12),(10,'Lý Văn K','candidate10@example.com','1990-10-05','Hà Nội','avatar10.jpg','Tôi có kỹ năng phân tích dữ liệu tốt.','0123456790','cv10.pdf',13),(11,'Nguyễn Thị L','candidate11@example.com','1995-02-14','Hồ Chí Minh','avatar11.jpg','Tôi có kinh nghiệm trong ngành tài chính.','0123456791','cv11.pdf',14),(12,'Trần Văn M','candidate12@example.com','1996-03-16','Đà Nẵng','avatar12.jpg','Tôi yêu thích công việc liên quan đến thiết kế.','0123456792','cv12.pdf',15),(13,'Lê Thị N','candidate13@example.com','1997-05-20','Hà Nội','avatar13.jpg','Tôi có kỹ năng tổ chức tốt.','0123456793','cv13.pdf',16),(14,'Phạm Văn O','candidate14@example.com','1998-07-22','Hải Phòng','avatar14.jpg','Tôi đam mê công việc trong ngành y tế.','0123456794','cv14.pdf',17),(15,'Hoàng Thị P','candidate15@example.com','1999-09-25','Cần Thơ','avatar15.jpg','Tôi có kinh nghiệm trong ngành du lịch.','0123456795','cv15.pdf',18),(16,'Ngô Văn Q','candidate16@example.com','1994-11-28','Hà Nội','avatar16.jpg','Tôi có kỹ năng quản lý dự án.','0123456796','cv16.pdf',19),(17,'Đỗ Thị R','candidate17@example.com','1993-01-30','Hồ Chí Minh','avatar17.jpg','Tôi yêu thích công việc liên quan đến nhân sự.','0123456797','cv17.pdf',20),(18,'Vũ Văn S','candidate18@example.com','1992-03-10','Đà Nẵng','avatar18.jpg','Tôi có kinh nghiệm trong ngành xây dựng.','0123456798','cv18.pdf',21),(19,'Bùi Thị T','candidate19@example.com','1991-05-12','Hà Nội','avatar19.jpg','Tôi có kỹ năng viết lách tốt.','0123456799','cv19.pdf',22),(20,'Lý Văn U','candidate20@example.com','1990-07-15','Hồ Chí Minh','avatar20.jpg','Tôi yêu thích công việc liên quan đến môi trường.','0123456800','cv20.pdf',23);
+INSERT INTO `candidate` VALUES (3,'Le Van C','1985-03-15','Tỉnh Điện Biên','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748239832/s4orjuxfeco7xtgcpk5g.jpg','Marketer','0938765432','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748239844/mpflopfydsex5dmojslp.pdf',21),(5,'Vo Van E','1991-05-18','Hai Phong','avatar5.jpg','Sales Manager','0983123456','cv5.pdf',23),(6,'Hoang Thi F','1993-06-30','Nha Trang','avatar6.jpg','Finance Analyst','0129876543','cv6.pdf',24),(7,'Nguyen Van G','1987-07-21','Hue','avatar7.jpg','Teacher','0908765432','cv7.pdf',25),(15,'Truong Van O','1983-03-23','Ca Mau','avatar15.jpg','Chef','0978765432','cv15.pdf',33),(24,'Nguyễn Văn A','1995-08-20','Hồ Chí Minh','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746810809/epuo5q1b4feaacjh7wrj.png','Tôi là một lập trình viên..','0123456789','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746810810/sgnbap5oirbropcajfnh.pdf',54),(25,'Hứa Quang Đạt','2025-05-13','Huyện Lai Vung','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746812500/ra8rhrqpxbj9iiwn3fdr.jpg','io','0833443033','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746810810/sgnbap5oirbropcajfnh.pdf',56),(26,'Hứa Quang Đạt','2025-05-19','Huyện Lai Vung','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746812693/eeopyul94okqzejw3itd.jpg',NULL,'0833439002','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746810810/sgnbap5oirbropcajfnh.pdf',57),(27,'Hứa Quang Đạt','2025-05-22','Huyện Lai Vung','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746815138/rqmnad49uktcwalv9lym.jpg',NULL,'0233443002','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746810810/sgnbap5oirbropcajfnh.pdf',58),(28,'Hứa Quang Đạt 2245','2025-06-20','Tỉnh Đồng Nai','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747473282/jdmkgetf9sjnxm8rnxcc.jpg','ko','09130923445','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747473283/lauxmhpo8qpx1xfit45n.pdf',61),(32,'Nguyễn Văn A','1995-08-20','Hồ Chí Minh','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748283999/lbbgvml8k9dshmwmdtxd.png','Tôi là một lập trình viên..','01234562789','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748284001/lupgwjduchkumkbwz3l2.pdf',81),(37,'Lê Quang Khôi','2025-05-13','Tỉnh Hoà Bình','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748345549/wwdxworxdtwsz9vgfmja.jpg','','093959949',NULL,88),(38,'Lê Quang Khôi','2025-05-13','Tỉnh Lai Châu','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748346187/ilnqkpn6tchhoh2rcpi9.jpg','','0939599499',NULL,89),(39,'Võ Toàn Thắng','2025-05-08',NULL,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748354246/haubbyjnvjf7ld2asat7.jpg',NULL,NULL,NULL,90),(40,'Đạt Hứa Quang','2025-05-08','Tỉnh Bắc Giang','https://lh3.googleusercontent.com/a/ACg8ocKB-3MWjDzlEwBQUg6aFtxJL81JOlnmQ9u5nWNERr6Ed-y7qw=s96-c','',NULL,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537326/n4cuqebckjbcum5q7nxl.pdf',93),(41,'Hứa Quang Đạt 123','2025-04-23','Tỉnh Sơn La','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537995/wofnqtns3prgagyhnzqj.jpg','ok','0913092445','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748537997/bpazvroeijnw1rbtrdkr.pdf',94),(42,'Đinh Lợi','2025-05-20','Tỉnh Lai Châu','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748682640/i8wol8blhawdm4kjoddu.jpg','','',NULL,96);
 /*!40000 ALTER TABLE `candidate` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -98,12 +96,15 @@ CREATE TABLE `candidate_review` (
   `rating` int DEFAULT NULL,
   `job_id` int NOT NULL,
   `company_id` int NOT NULL,
+  `candidate_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `job_id` (`job_id`),
   KEY `company_id` (`company_id`),
+  KEY `fk_candidate_review_candidate` (`candidate_id`),
   CONSTRAINT `candidate_review_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `candidate_review_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `candidate_review_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_candidate_review_candidate` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +113,7 @@ CREATE TABLE `candidate_review` (
 
 LOCK TABLES `candidate_review` WRITE;
 /*!40000 ALTER TABLE `candidate_review` DISABLE KEYS */;
-INSERT INTO `candidate_review` VALUES (1,'Rất chuyên nghiệp và có kỹ năng tốt.','2025-04-26 14:30:00',5,1,1),(2,'Thái độ tốt nhưng cần thêm kinh nghiệm.','2025-04-26 14:45:00',3,2,2),(3,'Ứng viên có kỹ năng giảng dạy tốt.','2025-04-26 15:00:00',4,3,3),(4,'Ứng viên chăm chỉ, phù hợp với công việc.','2025-04-26 15:15:00',4,4,4),(5,'Có kỹ năng tổ chức sự kiện tốt.','2025-04-26 15:30:00',5,5,5),(6,'Ứng viên cần cải thiện kỹ năng giao tiếp.','2025-04-26 15:45:00',3,6,6),(7,'Rất sáng tạo trong công việc marketing.','2025-04-26 16:00:00',5,7,7),(8,'Kỹ năng tuyển dụng tốt, thái độ chuyên nghiệp.','2025-04-26 16:15:00',4,8,8),(9,'Có kinh nghiệm xây dựng nhưng cần thêm sáng tạo.','2025-04-26 16:30:00',3,9,9),(10,'Ứng viên rất phù hợp với vị trí bác sĩ.','2025-04-26 16:45:00',5,10,10),(11,'Kỹ năng giao tiếp tốt, phù hợp với du lịch.','2025-04-26 17:00:00',4,11,11),(12,'Có mắt thẩm mỹ tốt trong thiết kế thời trang.','2025-04-26 17:15:00',5,12,12),(13,'Ứng viên có kiến thức sâu về nông nghiệp.','2025-04-26 17:30:00',4,13,13),(14,'Kỹ năng lập trình ấn tượng.','2025-04-26 17:45:00',5,14,14),(15,'Có kinh nghiệm kế toán tốt.','2025-04-26 18:00:00',4,15,15),(16,'Ứng viên có kỹ năng kiến trúc tốt.','2025-04-26 18:15:00',5,16,16),(17,'Ứng viên rất tận tâm với công việc y tá.','2025-04-26 18:30:00',5,17,17),(18,'Kỹ năng bán hàng tốt, phù hợp với du lịch.','2025-04-26 18:45:00',4,18,18),(19,'Có kỹ năng thiết kế đồ họa xuất sắc.','2025-04-26 19:00:00',5,19,19),(20,'Ứng viên có kinh nghiệm quản lý trang trại.','2025-04-26 19:15:00',4,20,20);
+INSERT INTO `candidate_review` VALUES (2,'gfd','2025-05-31 20:56:06',1,1,42,27),(3,'s','2025-05-31 21:14:08',1,1,42,3),(4,'s','2025-05-31 21:15:25',1,2,42,37),(5,'dở','2025-06-01 09:52:15',1,2,42,40),(6,'gxc','2025-05-31 22:25:10',1,27,57,7);
 /*!40000 ALTER TABLE `candidate_review` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,7 +127,6 @@ DROP TABLE IF EXISTS `company`;
 CREATE TABLE `company` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `avatar` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `self_description` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
@@ -136,11 +136,10 @@ CREATE TABLE `company` (
   `status` enum('approved','pending','refused') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `user_id` int NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
   UNIQUE KEY `tax_code` (`tax_code`),
   UNIQUE KEY `user_id` (`user_id`),
   CONSTRAINT `company_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -149,8 +148,40 @@ CREATE TABLE `company` (
 
 LOCK TABLES `company` WRITE;
 /*!40000 ALTER TABLE `company` DISABLE KEYS */;
-INSERT INTO `company` VALUES (1,'Công ty TechCorp','company1@example.com','logo1.jpg','Công ty công nghệ hàng đầu tại Việt Nam.','TAX001','123 Đường Công Nghệ','Hà Nội','Cầu Giấy','approved',24),(2,'Công ty Foodie','company2@example.com','logo2.jpg','Chuyên cung cấp dịch vụ ăn uống và giải khát.','TAX002','456 Đại lộ Ẩm Thực','Hồ Chí Minh','Quận 1','approved',25),(3,'Công ty EduSmart','company3@example.com','logo3.jpg','Đơn vị cung cấp giải pháp giáo dục hiện đại.','TAX003','789 Đường Giáo Dục','Đà Nẵng','Hải Châu','approved',26),(4,'Công ty LogiFast','company4@example.com','logo4.jpg','Chuyên về vận chuyển và hậu cần.','TAX004','101 Đường Hậu Cần','Hà Nội','Ba Đình','pending',27),(5,'Công ty EventPro','company5@example.com','logo5.jpg','Tổ chức sự kiện chuyên nghiệp.','TAX005','202 Đường Sự Kiện','Hồ Chí Minh','Quận 7','approved',28),(6,'Công ty CleanHome','company6@example.com','logo6.jpg','Dịch vụ dọn dẹp và nội trợ.','TAX006','303 Đường Sạch Sẽ','Đà Nẵng','Thanh Khê','pending',29),(7,'Công ty MarketPlus','company7@example.com','logo7.jpg','Chuyên về marketing và truyền thông.','TAX007','404 Đường Truyền Thông','Hà Nội','Đống Đa','approved',30),(8,'Công ty HR Solutions','company8@example.com','logo8.jpg','Giải pháp nhân sự và tuyển dụng.','TAX008','505 Đường Nhân Sự','Hồ Chí Minh','Bình Thạnh','approved',31),(9,'Công ty TechBuild','company9@example.com','logo9.jpg','Công ty xây dựng và kỹ thuật.','TAX009','606 Đường Kỹ Thuật','Đà Nẵng','Liên Chiểu','pending',32),(10,'Công ty HealthCare','company10@example.com','logo10.jpg','Dịch vụ y tế và sức khỏe.','TAX010','707 Đường Sức Khỏe','Hà Nội','Hoàn Kiếm','approved',33),(11,'Công ty TravelJoy','company11@example.com','logo11.jpg','Chuyên về du lịch và nhà hàng.','TAX011','808 Đường Du Lịch','Hồ Chí Minh','Quận 3','approved',34),(12,'Công ty FashionTrend','company12@example.com','logo12.jpg','Thời trang và thiết kế.','TAX012','909 Đường Thời Trang','Đà Nẵng','Sơn Trà','pending',35),(13,'Công ty AgriGreen','company13@example.com','logo13.jpg','Nông nghiệp và môi trường.','TAX013','111 Đường Môi Trường','Hà Nội','Thanh Xuân','approved',36),(14,'Công ty SoftDev','company14@example.com','logo14.jpg','Phát triển phần mềm.','TAX014','222 Đường Phần Mềm','Hồ Chí Minh','Tân Bình','approved',37),(15,'Công ty FinancePro','company15@example.com','logo15.jpg','Dịch vụ tài chính và kế toán.','TAX015','333 Đường Tài Chính','Đà Nẵng','Ngũ Hành Sơn','pending',38),(16,'Công ty BuildHigh','company16@example.com','logo16.jpg','Xây dựng và kiến trúc.','TAX016','444 Đường Xây Dựng','Hà Nội','Hai Bà Trưng','approved',39),(17,'Công ty MedCare','company17@example.com','logo17.jpg','Chăm sóc y tế.','TAX017','555 Đường Y Tế','Hồ Chí Minh','Gò Vấp','approved',40),(18,'Công ty TourEasy','company18@example.com','logo18.jpg','Dịch vụ du lịch.','TAX018','666 Đường Du Lịch 2','Đà Nẵng','Hải Châu','approved',41),(19,'Công ty DesignPro','company19@example.com','logo19.jpg','Thiết kế sáng tạo.','TAX019','777 Đường Thiết Kế','Hà Nội','Cầu Giấy','approved',42),(20,'Công ty EcoFarm','company20@example.com','logo20.jpg','Nông nghiệp bền vững.','TAX020','888 Đường Nông Nghiệp','Hồ Chí Minh','Quận 1','approved',43);
+INSERT INTO `company` VALUES (1,'CongtyAA','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1738810431/oc9q0gpagonth8udacqx.jpg','No','1010101044','123 Lê Lợi, Phường Bến Nghé','Hồ Chí Minh','Quận 1','approved',1),(4,'CongtyB','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1738801801/noiu9llvbjrd8cr9leut.jpg','No','90909090','456 Nguyễn Huệ, Phường Bến Nghé','Hồ Chí Minh','Quận 1','approved',2),(20,'Công ty A','avatarA.png','Mô tả A','MST001','789 Võ Văn Tần, Phường 5','Hồ Chí Minh','Quận 3','approved',3),(35,'Hứa Quang Đạt','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746046503/e5aeyyjbavlrovrgmc1a.jpg','9mmm','030303','101 Nguyễn Văn Cừ, Phường Cầu Kho','Hồ Chí Minh','Quận 1','approved',40),(41,'Công ty TNHH ABC','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1747468330/ujwioblgsd9ygkktgzus.png','Chuyên phát triển phần mềm doanh nghiệp.','1234567890','234 Lý Tự Trọng, Phường Bến Thành','Hồ Chí Minh','Quận 1','approved',55),(42,'OKCom','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746865549/lzdqmsopoqcvqbqeijph.jpg','ok','03030','567 Nguyễn Đình Chiểu, Phường 2','Hồ Chí Minh','Quận 3','approved',59),(43,'Hứa Quang Đạt','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748228196/ks7d2hgxcvdgkxcvpmf0.jpg','kok3k3','3232332323','890 Phạm Văn Đồng, Phường Linh Đông','Hồ Chí Minh','Thủ Đức','approved',68),(44,'Hứa Quang Đạt233333','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748230251/kylgblt0nlwpfmkt7iis.jpg','okokoko','43344333','111 Trường Chinh, Phường 12','Hồ Chí Minh','Tân Bình','approved',69),(48,'Cong ty 777','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748240430/myck44oq7aggytlesjob.png','okok','03030322332','222 Xô Viết Nghệ Tĩnh, Phường 21','Hồ Chí Minh','Bình Thạnh','approved',75),(54,'jugug','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748334695/vtccvpqhvymk1qwjguuv.jpg','','1234567890123','333 Điện Biên Phủ, Phường 15','Hồ Chí Minh','Bình Thạnh','approved',86),(55,'gà mờ','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748340505/xfmxjcwyaf93zwqvf33p.png','ok','1233567890','444 Lê Văn Sỹ, Phường 14','Hồ Chí Minh','Quận 3','approved',87),(56,'Gigachad Company','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748354916/wpfmlmbdxgnyk5n5jzao.png','','1212121212','555 Nguyễn Trãi, Phường 7','Hồ Chí Minh','Quận 5','approved',91),(57,'Nguyễn Trung Hậu','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748445847/swdd3dzfuhhl9up7dgeu.jpg','d','9876543210','483/11 Đào Sư Tích','Tỉnh Quảng Ninh','Thành phố Đông Triều','approved',92),(58,'Công ty dầu hỏa','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748538267/dqni3upet1asxadcvgry.png','ok','0987654321','15 Đ. Trần Bạch Đằng, Thủ Thiêm, Thủ Đức, Hồ Chí Minh','Thành phố Hồ Chí Minh','Quận 6','approved',95);
 /*!40000 ALTER TABLE `company` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `company_authentication`
+--
+
+DROP TABLE IF EXISTS `company_authentication`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `company_authentication` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `paper` varchar(100) NOT NULL,
+  `id_card_front` varchar(100) NOT NULL,
+  `id_card_back` varchar(100) NOT NULL,
+  `company_id` int NOT NULL,
+  `status` enum('approved','pending','refused') NOT NULL DEFAULT 'pending',
+  `feedback` text,
+  `last_updated` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `company_id_UNIQUE` (`company_id`),
+  CONSTRAINT `ca_to_company_id` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `company_authentication`
+--
+
+LOCK TABLES `company_authentication` WRITE;
+/*!40000 ALTER TABLE `company_authentication` DISABLE KEYS */;
+INSERT INTO `company_authentication` VALUES (10,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748687081/xumwdpt6i29ucaidfskm.pdf','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748687085/lfjdhqrbac6dwlht0f9k.jpg','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748687088/qwzbai1uhbg92noybwer.png',42,'pending',NULL,'2025-05-31 17:24:38'),(12,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748688975/focyzmvjs4h6tikcosow.pdf','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748688979/msp6oyhrq1yjtje98iac.png','https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748688983/zqx2tawm1gcgx23fjw4a.png',58,'pending',NULL,'2025-05-31 17:56:12');
+/*!40000 ALTER TABLE `company_authentication` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -167,12 +198,15 @@ CREATE TABLE `company_review` (
   `rating` int DEFAULT NULL,
   `job_id` int NOT NULL,
   `candidate_id` int NOT NULL,
+  `application_id` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `job_id` (`job_id`),
   KEY `candidate_id` (`candidate_id`),
+  KEY `fk_company_review_application` (`application_id`),
   CONSTRAINT `company_review_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `company_review_ibfk_2` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `company_review_ibfk_2` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_company_review_application` FOREIGN KEY (`application_id`) REFERENCES `application` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -181,7 +215,6 @@ CREATE TABLE `company_review` (
 
 LOCK TABLES `company_review` WRITE;
 /*!40000 ALTER TABLE `company_review` DISABLE KEYS */;
-INSERT INTO `company_review` VALUES (1,'Môi trường làm việc rất tốt!','2025-04-26 14:00:00',5,1,1),(2,'Lương cao nhưng áp lực lớn.','2025-04-26 14:15:00',4,2,2),(3,'Công ty hỗ trợ giáo viên rất tốt.','2025-04-26 14:30:00',5,3,3),(4,'Công ty cần cải thiện chế độ đãi ngộ.','2025-04-26 14:45:00',3,4,4),(5,'Môi trường sáng tạo, phù hợp với tổ chức sự kiện.','2025-04-26 15:00:00',5,5,5),(6,'Công ty cần cải thiện quản lý nhân sự.','2025-04-26 15:15:00',3,6,6),(7,'Công ty có nhiều cơ hội phát triển trong marketing.','2025-04-26 15:30:00',5,7,7),(8,'Môi trường làm việc chuyên nghiệp.','2025-04-26 15:45:00',4,8,8),(9,'Công ty cần cải thiện phúc lợi cho nhân viên.','2025-04-26 16:00:00',3,9,9),(10,'Môi trường y tế rất tốt, đồng nghiệp thân thiện.','2025-04-26 16:15:00',5,10,10),(11,'Công ty du lịch có nhiều cơ hội học hỏi.','2025-04-26 16:30:00',4,11,11),(12,'Môi trường sáng tạo, phù hợp với thiết kế thời trang.','2025-04-26 16:45:00',5,12,12),(13,'Công ty nông nghiệp hỗ trợ nhân viên tốt.','2025-04-26 17:00:00',4,13,13),(14,'Môi trường công nghệ rất năng động.','2025-04-26 17:15:00',5,14,14),(15,'Công ty tài chính cần cải thiện lương thưởng.','2025-04-26 17:30:00',3,15,15),(16,'Môi trường làm việc chuyên nghiệp trong ngành kiến trúc.','2025-04-26 17:45:00',5,16,16),(17,'Công ty y tế có môi trường làm việc tốt.','2025-04-26 18:00:00',5,17,17),(18,'Công ty du lịch cần cải thiện quản lý.','2025-04-26 18:15:00',3,18,18),(19,'Môi trường thiết kế rất sáng tạo.','2025-04-26 18:30:00',5,19,19),(20,'Công ty nông nghiệp có nhiều cơ hội phát triển.','2025-04-26 18:45:00',4,20,20);
 /*!40000 ALTER TABLE `company_review` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -206,7 +239,7 @@ CREATE TABLE `day` (
 
 LOCK TABLES `day` WRITE;
 /*!40000 ALTER TABLE `day` DISABLE KEYS */;
-INSERT INTO `day` VALUES (9,'Bất kỳ thời gian nào'),(7,'Chủ Nhật'),(2,'Thứ Ba'),(6,'Thứ Bảy'),(1,'Thứ Hai'),(4,'Thứ Năm'),(5,'Thứ Sáu'),(3,'Thứ Tư'),(8,'Toàn thời gian');
+INSERT INTO `day` VALUES (9,'Anytime'),(5,'Friday'),(8,'Full'),(1,'Monday'),(6,'Saturday'),(7,'Sunday'),(4,'Thursday'),(2,'Tuesday'),(3,'Wednesday');
 /*!40000 ALTER TABLE `day` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -226,7 +259,7 @@ CREATE TABLE `day_job` (
   KEY `day_id` (`day_id`),
   CONSTRAINT `day_job_ibfk_1` FOREIGN KEY (`day_id`) REFERENCES `day` (`id`) ON DELETE SET NULL,
   CONSTRAINT `day_job_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,7 +268,7 @@ CREATE TABLE `day_job` (
 
 LOCK TABLES `day_job` WRITE;
 /*!40000 ALTER TABLE `day_job` DISABLE KEYS */;
-INSERT INTO `day_job` VALUES (1,8,1),(2,1,2),(3,2,2),(4,9,3),(5,9,4),(6,8,5),(7,9,6),(8,8,7),(9,8,8),(10,8,9),(11,8,10),(12,9,11),(13,8,12),(14,8,13),(15,8,14),(16,8,15),(17,8,16),(18,8,17),(19,9,18),(20,8,19),(21,8,20);
+INSERT INTO `day_job` VALUES (1,1,1),(2,2,2),(3,3,3),(6,6,6),(7,7,7),(8,8,8),(9,9,9),(34,1,10),(35,8,11),(12,2,12),(13,3,12),(18,2,13),(17,4,13),(14,5,13),(16,6,13),(15,8,13),(19,4,14),(20,4,15),(21,4,16),(22,4,17),(23,4,18),(24,4,19),(25,4,20),(26,4,21),(27,3,22),(28,7,22),(29,4,23),(30,4,24),(31,4,25),(32,5,26),(33,8,26),(38,7,27),(47,3,28),(46,4,28),(45,6,28),(49,7,30);
 /*!40000 ALTER TABLE `day_job` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,8 +282,8 @@ DROP TABLE IF EXISTS `follow`;
 CREATE TABLE `follow` (
   `id` int NOT NULL AUTO_INCREMENT,
   `follow_date` datetime NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '0',
-  `is_candidate_followed` tinyint(1) NOT NULL DEFAULT '1',
+  `is_active` bit(1) NOT NULL DEFAULT b'0',
+  `is_candidate_followed` bit(1) NOT NULL DEFAULT b'1',
   `candidate_id` int NOT NULL,
   `company_id` int NOT NULL,
   PRIMARY KEY (`id`),
@@ -258,7 +291,7 @@ CREATE TABLE `follow` (
   KEY `company_id` (`company_id`),
   CONSTRAINT `follow_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`id`) ON DELETE CASCADE,
   CONSTRAINT `follow_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -267,7 +300,7 @@ CREATE TABLE `follow` (
 
 LOCK TABLES `follow` WRITE;
 /*!40000 ALTER TABLE `follow` DISABLE KEYS */;
-INSERT INTO `follow` VALUES (1,'2025-04-26 13:00:00',1,1,1,1),(2,'2025-04-26 13:15:00',1,1,2,2),(3,'2025-04-26 13:30:00',1,1,3,3),(4,'2025-04-26 13:45:00',1,1,4,4),(5,'2025-04-26 14:00:00',1,1,5,5),(6,'2025-04-26 14:15:00',1,1,6,6),(7,'2025-04-26 14:30:00',1,1,7,7),(8,'2025-04-26 14:45:00',1,1,8,8),(9,'2025-04-26 15:00:00',1,1,9,9),(10,'2025-04-26 15:15:00',1,1,10,10),(11,'2025-04-26 15:30:00',1,1,11,11),(12,'2025-04-26 15:45:00',1,1,12,12),(13,'2025-04-26 16:00:00',1,1,13,13),(14,'2025-04-26 16:15:00',1,1,14,14),(15,'2025-04-26 16:30:00',1,1,15,15),(16,'2025-04-26 16:45:00',1,1,16,16),(17,'2025-04-26 17:00:00',1,1,17,17),(18,'2025-04-26 17:15:00',1,1,18,18),(19,'2025-04-26 17:30:00',1,1,19,19),(20,'2025-04-26 17:45:00',1,1,20,20);
+INSERT INTO `follow` VALUES (1,'2025-05-30 12:16:05',_binary '\0',_binary '',40,58),(2,'2025-05-30 13:18:42',_binary '\0',_binary '',40,58),(3,'2025-05-30 17:10:09',_binary '\0',_binary '',41,58),(4,'2025-05-30 17:10:32',_binary '\0',_binary '',41,58),(5,'2025-05-30 17:16:11',_binary '\0',_binary '',41,58),(6,'2025-05-30 17:20:10',_binary '\0',_binary '',40,58),(7,'2025-05-31 13:18:16',_binary '\0',_binary '',41,57),(8,'2025-05-31 13:19:29',_binary '\0',_binary '',41,57),(9,'2025-05-31 14:43:12',_binary '\0',_binary '',41,58),(10,'2025-05-31 15:00:46',_binary '',_binary '',41,57),(11,'2025-05-31 15:10:43',_binary '',_binary '',41,58),(12,'2025-05-31 20:11:03',_binary '\0',_binary '',27,1),(13,'2025-05-31 23:42:08',_binary '\0',_binary '',27,1),(14,'2025-06-01 09:39:10',_binary '',_binary '',37,57);
 /*!40000 ALTER TABLE `follow` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -285,7 +318,7 @@ CREATE TABLE `image_workplace` (
   PRIMARY KEY (`id`),
   KEY `company_id` (`company_id`),
   CONSTRAINT `image_workplace_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -294,7 +327,7 @@ CREATE TABLE `image_workplace` (
 
 LOCK TABLES `image_workplace` WRITE;
 /*!40000 ALTER TABLE `image_workplace` DISABLE KEYS */;
-INSERT INTO `image_workplace` VALUES (1,'anh_techcorp_1.jpg',1),(2,'anh_techcorp_2.jpg',1),(3,'anh_foodie_1.jpg',2),(4,'anh_foodie_2.jpg',2),(5,'anh_edusmart_1.jpg',3),(6,'anh_edusmart_2.jpg',3),(7,'anh_logifast_1.jpg',4),(8,'anh_logifast_2.jpg',4),(9,'anh_eventpro_1.jpg',5),(10,'anh_eventpro_2.jpg',5),(11,'anh_cleanhome_1.jpg',6),(12,'anh_cleanhome_2.jpg',6),(13,'anh_marketplus_1.jpg',7),(14,'anh_marketplus_2.jpg',7),(15,'anh_hrsolutions_1.jpg',8),(16,'anh_hrsolutions_2.jpg',8),(17,'anh_techbuild_1.jpg',9),(18,'anh_techbuild_2.jpg',9),(19,'anh_healthcare_1.jpg',10),(20,'anh_healthcare_2.jpg',10),(21,'anh_traveljoy_1.jpg',11),(22,'anh_traveljoy_2.jpg',11),(23,'anh_fashiontrend_1.jpg',12),(24,'anh_fashiontrend_2.jpg',12),(25,'anh_agrigreen_1.jpg',13),(26,'anh_agrigreen_2.jpg',13),(27,'anh_softdev_1.jpg',14),(28,'anh_softdev_2.jpg',14),(29,'anh_financepro_1.jpg',15),(30,'anh_financepro_2.jpg',15),(31,'anh_buildhigh_1.jpg',16),(32,'anh_buildhigh_2.jpg',16),(33,'anh_medcare_1.jpg',17),(34,'anh_medcare_2.jpg',17),(35,'anh_toureasy_1.jpg',18),(36,'anh_toureasy_2.jpg',18),(37,'anh_designpro_1.jpg',19),(38,'anh_designpro_2.jpg',19),(39,'anh_ecofarm_1.jpg',20),(40,'anh_ecofarm_2.jpg',20);
+INSERT INTO `image_workplace` VALUES (1,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1738810611/kx4cau85uf4it8b13kwf.jpg',1),(2,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1738810611/fljcdtkwmw3iw4bxesga.jpg',1),(3,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1738810434/g825b3zj04hvmwzsfk5v.jpg',1),(10,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746811684/kaxjgakcg193hnnxjtod.jpg',41),(11,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746811687/qbt18io4n6c2mju30om6.png',41),(12,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746811689/cgd8mutbn6drmfkaawlp.jpg',41),(13,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746865552/onx0y6jqpehrc4ciidwz.png',42),(14,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746865555/uueef07boklpuomipc0t.png',42),(15,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1746865558/lfb3nuecasj9ys4oasnr.jpg',42),(16,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748228198/ypdi0m89aa8lttb3pwxl.jpg',43),(17,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748228201/vno9rg0ylaysrkhwhbyx.jpg',43),(18,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748228204/wyy5nqubohkyhrisbgyn.png',43),(19,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748230254/y4c4m0q7wvim5upznmdn.png',44),(20,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748230257/utvnqyhsz4xa3fstxczs.png',44),(21,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748230260/zy2pnq4ir8cw8byqth15.jpg',44),(31,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748240433/jmsxzchjmd91qzc2zjft.jpg',48),(32,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748240435/semopgnrjbmbg5omsjdx.jpg',48),(33,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748240438/hjrx3yweubiuidh4qwps.jpg',48),(49,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748334696/zjihatjzcuucfzzl1ior.jpg',54),(50,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748334697/uxahfalksonrrn7v8fp3.jpg',54),(51,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748334701/nhgdamcmlqjxti8b2sxk.png',54),(52,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748340509/jg1s3pubwxxdxwjfz9wl.png',55),(53,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748340514/b5hy74qgrrg9ns5slnam.png',55),(54,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748340516/tp0xhvaanrrtptm2vc5q.png',55),(55,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748354920/axphslhhj7pgz94knhij.jpg',56),(56,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748354922/exb2ndhmsm1b5dndc1ys.png',56),(57,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748354924/pb804f8sqtitcu3c6tbc.jpg',56),(58,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748445851/pod1r1hykxykcrgs9l9m.jpg',57),(59,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748445853/jml7a6ecqxc0ub0vfmtt.jpg',57),(60,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748445855/dfo07d623venljddsdqk.png',57),(61,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748538270/zsl1a5fxsn4dkramgygz.jpg',58),(62,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748538272/grfkd7gn6u0mer464cqc.jpg',58),(63,'https://res.cloudinary.com/dmbvjjg5a/image/upload/v1748538273/j7ss3se1jmnurlcvpnbz.jpg',58);
 /*!40000 ALTER TABLE `image_workplace` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,15 +352,15 @@ CREATE TABLE `job` (
   `city` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `district` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` enum('approved','pending','refused') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` bit(1) NOT NULL DEFAULT b'0',
   `posted_date` datetime DEFAULT NULL,
   `company_id` int NOT NULL,
-  `latitude` double DEFAULT NULL,
-  `longitude` double DEFAULT NULL,
+  `longitude` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
+  `latitude` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `company_id` (`company_id`),
   CONSTRAINT `job_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -336,7 +369,7 @@ CREATE TABLE `job` (
 
 LOCK TABLES `job` WRITE;
 /*!40000 ALTER TABLE `job` DISABLE KEYS */;
-INSERT INTO `job` VALUES (1,'Kỹ sư phần mềm','Phát triển và bảo trì các ứng dụng web.','Tốt nghiệp đại học ngành CNTT, 2+ năm kinh nghiệm.',15000000,25000000,22,35,2,'123 Đường Công Nghệ','Hà Nội','Cầu Giấy','pending',1,'2025-04-26 09:00:00',1,21.0285,105.8481),(2,'Nhân viên dịch vụ khách hàng','Xử lý các yêu cầu và khiếu nại của khách hàng.','Kỹ năng giao tiếp tốt, 1+ năm kinh nghiệm.',8000000,12000000,20,30,1,'456 Đại lộ Ẩm Thực','Hồ Chí Minh','Quận 1','approved',1,'2025-04-26 10:00:00',2,10.7769,106.7009),(3,'Giáo viên tiếng Anh','Dạy tiếng Anh cho học sinh tiểu học.','Tốt nghiệp đại học, chứng chỉ TESOL.',10000000,15000000,22,40,1,'789 Đường Giáo Dục','Đà Nẵng','Hải Châu','approved',1,'2025-04-26 11:00:00',3,16.0471,108.2068),(4,'Tài xế giao hàng','Giao các đơn hàng đến khách hàng.','Có xe máy, kỹ năng định vị tốt.',7000000,10000000,18,40,0,'101 Đường Hậu Cần','Hà Nội','Ba Đình','approved',1,'2025-04-26 12:00:00',4,21.0367,105.8342),(5,'Nhân viên tổ chức sự kiện','Lên kế hoạch và tổ chức sự kiện.','Kỹ năng tổ chức, 1+ năm kinh nghiệm.',9000000,13000000,20,35,1,'202 Đường Sự Kiện','Hồ Chí Minh','Quận 7','pending',1,'2025-04-26 13:00:00',5,10.7299,106.7234),(6,'Nhân viên dọn dẹp','Dọn dẹp văn phòng và nhà ở.','Chăm chỉ, không yêu cầu kinh nghiệm.',6000000,8000000,18,50,0,'303 Đường Sạch Sẽ','Đà Nẵng','Thanh Khê','approved',1,'2025-04-26 14:00:00',6,16.0667,108.2099),(7,'Nhân viên marketing','Thực hiện các chiến dịch quảng cáo.','Tốt nghiệp đại học ngành marketing, 2+ năm kinh nghiệm.',12000000,18000000,22,35,2,'404 Đường Truyền Thông','Hà Nội','Đống Đa','approved',1,'2025-04-26 15:00:00',7,21.0162,105.8299),(8,'Chuyên viên tuyển dụng','Tuyển dụng và quản lý nhân sự.','Kỹ năng giao tiếp, 1+ năm kinh nghiệm.',10000000,15000000,22,40,1,'505 Đường Nhân Sự','Hồ Chí Minh','Bình Thạnh','pending',1,'2025-04-26 16:00:00',8,10.8039,106.7219),(9,'Kỹ sư xây dựng','Thiết kế và giám sát công trình.','Tốt nghiệp đại học ngành xây dựng, 3+ năm kinh nghiệm.',15000000,20000000,25,45,3,'606 Đường Kỹ Thuật','Đà Nẵng','Liên Chiểu','approved',1,'2025-04-26 17:00:00',9,16.0741,108.1498),(10,'Bác sĩ','Khám và điều trị bệnh nhân.','Tốt nghiệp đại học y, 2+ năm kinh nghiệm.',20000000,30000000,25,50,2,'707 Đường Sức Khỏe','Hà Nội','Hoàn Kiếm','approved',1,'2025-04-26 18:00:00',10,21.0313,105.8516),(11,'Hướng dẫn viên du lịch','Hướng dẫn khách du lịch tham quan.','Kỹ năng giao tiếp, biết tiếng Anh.',8000000,12000000,20,35,1,'808 Đường Du Lịch','Hồ Chí Minh','Quận 3','approved',1,'2025-04-26 19:00:00',11,10.7872,106.6937),(12,'Nhà thiết kế thời trang','Thiết kế quần áo và phụ kiện.','Tốt nghiệp ngành thiết kế, 2+ năm kinh nghiệm.',12000000,18000000,22,35,2,'909 Đường Thời Trang','Đà Nẵng','Sơn Trà','pending',1,'2025-04-26 20:00:00',12,16.0815,108.2235),(13,'Kỹ sư nông nghiệp','Nghiên cứu và phát triển nông nghiệp bền vững.','Tốt nghiệp đại học ngành nông nghiệp, 1+ năm kinh nghiệm.',10000000,15000000,22,40,1,'111 Đường Môi Trường','Hà Nội','Thanh Xuân','approved',1,'2025-04-26 21:00:00',13,21.0076,105.8118),(14,'Lập trình viên','Phát triển ứng dụng di động.','Tốt nghiệp đại học ngành CNTT, 2+ năm kinh nghiệm.',15000000,25000000,22,35,2,'222 Đường Phần Mềm','Hồ Chí Minh','Tân Bình','approved',1,'2025-04-26 22:00:00',14,10.8019,106.6601),(15,'Kế toán viên','Quản lý tài chính và sổ sách kế toán.','Tốt nghiệp đại học ngành kế toán, 1+ năm kinh nghiệm.',10000000,15000000,22,40,1,'333 Đường Tài Chính','Đà Nẵng','Ngũ Hành Sơn','approved',1,'2025-04-26 23:00:00',15,16.0345,108.2456),(16,'Kỹ sư kiến trúc','Thiết kế và lập kế hoạch công trình.','Tốt nghiệp đại học ngành kiến trúc, 3+ năm kinh nghiệm.',15000000,20000000,25,45,3,'444 Đường Xây Dựng','Hà Nội','Hai Bà Trưng','approved',1,'2025-04-27 09:00:00',16,21.0158,105.8509),(17,'Y tá','Hỗ trợ bác sĩ và chăm sóc bệnh nhân.','Tốt nghiệp cao đẳng y, 1+ năm kinh nghiệm.',8000000,12000000,20,40,1,'555 Đường Y Tế','Hồ Chí Minh','Gò Vấp','approved',1,'2025-04-27 10:00:00',17,10.8389,106.6667),(18,'Nhân viên du lịch','Tư vấn và bán tour du lịch.','Kỹ năng bán hàng, biết tiếng Anh.',7000000,11000000,20,35,1,'666 Đường Du Lịch 2','Đà Nẵng','Hải Châu','pending',1,'2025-04-27 11:00:00',18,16.0471,108.2068),(19,'Nhà thiết kế đồ họa','Thiết kế logo và ấn phẩm truyền thông.','Tốt nghiệp ngành thiết kế, 2+ năm kinh nghiệm.',12000000,18000000,22,35,2,'777 Đường Thiết Kế','Hà Nội','Cầu Giấy','approved',1,'2025-04-27 12:00:00',19,21.0285,105.8481),(20,'Nhân viên nông nghiệp','Quản lý và vận hành trang trại.','Tốt nghiệp ngành nông nghiệp, 1+ năm kinh nghiệm.',8000000,12000000,20,40,1,'888 Đường Nông Nghiệp','Hồ Chí Minh','Quận 1','pending',1,'2025-04-27 13:00:00',20,10.7769,106.7009);
+INSERT INTO `job` VALUES (1,'Kỹ sư phần mềm','Phát triển phần mềm theo yêu cầu.','Tốt nghiệp CNTT, kinh nghiệm 2 năm.',10000000,20000000,22,35,2,'123 Lê Lợi, Phường Bến Nghé','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-01 00:00:00',42,'106.7009','10.7769'),(2,'Nhân viên kinh doanh','Tìm kiếm khách hàng mới.','Giao tiếp tốt, ngoại hình ưa nhìn.',8000000,15000000,20,30,1,'456 Nguyễn Huệ, Phường Bến Nghé','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-01 00:00:00',42,'106.7012','10.7758'),(3,'Kế toán tổng hợp','Quản lý sổ sách kế toán.','Tốt nghiệp ngành kế toán.',7000000,12000000,23,35,1,'789 Võ Văn Tần, Phường 5','Hồ Chí Minh','Quận 3','approved',_binary '','2025-05-01 00:00:00',1,'106.6867','10.7831'),(6,'Lập trình viên Java','Tham gia dự án Java Web.','Biết Spring Boot.',12000000,25000000,22,35,1,'101 Nguyễn Văn Cừ, Phường Cầu Kho','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-01 00:00:00',1,'106.6923','10.7698'),(7,'Thiết kế đồ họa','Thiết kế banner, poster.','Thành thạo Photoshop.',7000000,14000000,20,30,1,'234 Lý Tự Trọng, Phường Bến Thành','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-01 00:00:00',1,'106.6971','10.7774'),(8,'Nhân viên chăm sóc khách hàng','Giải đáp thắc mắc khách hàng.','Kỹ năng giao tiếp tốt.',6000000,10000000,20,32,0,'567 Nguyễn Đình Chiểu, Phường 2','Hồ Chí Minh','Quận 3','approved',_binary '','2025-05-01 00:00:00',4,'106.6824','10.7812'),(9,'Nhân viên cá kho','Quản lý nhập xuất kho.','Chịu được áp lực công việc.',5000000,8000000,22,40,0,'890 Phạm Văn Đồng, Phường Linh Đông','Hồ Chí Minh','Thủ Đức','approved',_binary '','2025-05-01 00:00:00',4,'106.7489','10.8491'),(10,'Giáo viên tiếng Anh','Giảng dạy tiếng Anh cho thiếu nhi.','TOEIC 800 trở lên.',10000000,18000000,24,40,1,'111 Trường Chinh, Phường 12','Hồ Chí Minh','Tân Bình','approved',_binary '','2025-05-01 00:00:00',1,'106.6534','10.8006'),(11,'Quét nhà','ok','ok',5000000,8000000,23,43,2,'222 Xô Viết Nghệ Tĩnh, Phường 21','Hồ Chí Minh','Bình Thạnh','approved',_binary '','2025-05-10 00:00:00',42,'106.7081','10.8034'),(12,'Quét nhà','ểuifnrefnh','n djhn hjfn',6000000,10000000,NULL,NULL,NULL,'333 Điện Biên Phủ, Phường 15','Hồ Chí Minh','Bình Thạnh','approved',_binary '','2025-05-10 00:00:00',42,'106.7115','10.7987'),(13,'Quét nhàjjejee','kwwkkwwk','kkdkcdkck',7000000,12000000,NULL,NULL,NULL,'444 Lê Văn Sỹ, Phường 14','Hồ Chí Minh','Quận 3','approved',_binary '','2025-05-10 00:00:00',42,'106.6742','10.7923'),(14,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'555 Nguyễn Trãi, Phường 7','Hồ Chí Minh','Quận 5','approved',_binary '','2025-05-10 00:00:00',42,'106.6689','10.7602'),(15,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'666 Cách Mạng Tháng Tám, Phường 11','Hồ Chí Minh','Quận 10','approved',_binary '','2025-05-10 00:00:00',42,'106.6698','10.7715'),(16,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'777 Huỳnh Tấn Phát, Phường Phú Thuận','Hồ Chí Minh','Quận 7','approved',_binary '','2025-05-15 00:00:00',42,'106.7356','10.7296'),(17,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'888 Tôn Đức Thắng, Phường Bến Nghé','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-15 00:00:00',42,'106.7045','10.7818'),(18,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'999 Nguyễn Thị Minh Khai, Phường 5','Hồ Chí Minh','Quận 3','approved',_binary '','2025-05-15 00:00:00',42,'106.6832','10.7865'),(19,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'123 Bùi Thị Xuân, Phường Phạm Ngũ Lão','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-15 00:00:00',42,'106.6957','10.7689'),(20,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'456 Pasteur, Phường 8','Hồ Chí Minh','Quận 3','approved',_binary '','2025-05-15 00:00:00',42,'106.6893','10.7801'),(21,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'789 Lê Hồng Phong, Phường 12','Hồ Chí Minh','Quận 10','approved',_binary '','2025-05-20 00:00:00',42,'106.6648','10.7632'),(22,'Quét nhàjjejee','jiji','nk',5000000,8000000,NULL,NULL,NULL,'101 Trần Hưng Đạo, Phường Cầu Ông Lãnh','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-20 00:00:00',42,'106.6901','10.7654'),(23,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'234 Nguyễn Công Trứ, Phường Nguyễn Thái Bình','Hồ Chí Minh','Quận 1','approved',_binary '','2025-05-20 00:00:00',42,'106.6998','10.7732'),(24,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'567 Hoàng Văn Thụ, Phường 4','Hồ Chí Minh','Tân Bình','approved',_binary '','2025-05-20 00:00:00',42,'106.6487','10.7991'),(25,'okokok','343434fff','4343',8000000,15000000,NULL,NULL,NULL,'890 CMT8, Phường 5','Hồ Chí Minh','Quận 10','approved',_binary '','2025-05-20 00:00:00',42,'106.6674','10.7739'),(26,'Quét nhà12','ko','ko',10000000,20000000,18,29,9,'111 Nguyễn Oanh, Phường 17','Hồ Chí Minh','Gò Vấp','approved',_binary '','2025-05-20 00:00:00',42,'106.6792','10.8367'),(27,'Thư ký','kHÔNG CÓ','KHÔNG CÓ',1288000,13999990,20,23,2,'đồng hỷ thái nguyên','Thái nguyên','Đồng hỷ','approved',_binary '','2025-05-29 23:32:38',57,'105.84521','21.63112'),(28,'Chở gas','ok','ok',20000,233232,39,58,10,'Phủ Tây Hồ, Ngõ 50 Đặng Thai Mai, Phường Quảng An, Quận Tây Hồ, Hà Nội, Việt Nam','Hà nội','Tây hồ','approved',_binary '','2025-05-30 00:23:44',58,'105.81975','21.05528'),(29,'Bảo vệ','Bảo vệ nhà xác','Có sức khỏe',120000,188000,20,23,1,'Chợ Trà Ôn, Đường Gia Long, Thị Trấn Trà Ôn, Huyện Trà Ôn, Vĩnh Long, Việt Nam','Vĩnh long','Trà ôn','pending',_binary '','2025-05-31 17:49:25',58,'105.91965','9.96604'),(30,'2','ok','ok',20,2200,19,20,1,'Huyện Bình Giang, Việt Nam','Chưa xác định','Chưa xác định','pending',_binary '','2025-05-31 17:51:29',58,'106.15006','20.90535');
 /*!40000 ALTER TABLE `job` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,7 +384,7 @@ CREATE TABLE `major` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -360,7 +393,7 @@ CREATE TABLE `major` (
 
 LOCK TABLES `major` WRITE;
 /*!40000 ALTER TABLE `major` DISABLE KEYS */;
-INSERT INTO `major` VALUES (1,'Bán lẻ & Kinh doanh'),(2,'Ẩm thực & Đồ uống'),(3,'Dịch vụ khách hàng'),(4,'Giao hàng & Hậu cần'),(5,'Gia sư & Giáo dục'),(6,'Hành chính & Văn phòng'),(7,'Làm việc tự do & Trực tuyến'),(8,'Sự kiện & Quảng bá'),(9,'Dọn dẹp & Nội trợ'),(10,'Dịch vụ công cộng'),(11,'Công nghệ thông tin'),(12,'Kế toán & Tài chính'),(13,'Marketing & Truyền thông'),(14,'Nhân sự & Tuyển dụng'),(15,'Kỹ thuật & Sản xuất'),(16,'Xây dựng & Kiến trúc'),(17,'Y tế & Sức khỏe'),(18,'Du lịch & Nhà hàng'),(19,'Thời trang & Thiết kế'),(20,'Nông nghiệp & Môi trường');
+INSERT INTO `major` VALUES (1,'Retail & Sales'),(2,'Food & Beverage'),(3,'Customer Service'),(4,'Delivery & Logistics'),(5,'Tutoring & Education'),(6,'Administrative & Office Work'),(7,'Freelancing & Online Work'),(8,'Events & Promotion'),(9,'Cleaning & Housekeeping'),(10,'Public Services');
 /*!40000 ALTER TABLE `major` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -380,7 +413,7 @@ CREATE TABLE `major_job` (
   KEY `major_id` (`major_id`),
   CONSTRAINT `major_job_ibfk_1` FOREIGN KEY (`major_id`) REFERENCES `major` (`id`) ON DELETE SET NULL,
   CONSTRAINT `major_job_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -389,7 +422,7 @@ CREATE TABLE `major_job` (
 
 LOCK TABLES `major_job` WRITE;
 /*!40000 ALTER TABLE `major_job` DISABLE KEYS */;
-INSERT INTO `major_job` VALUES (1,11,1),(2,3,2),(3,5,3),(4,4,4),(5,8,5),(6,9,6),(7,13,7),(8,14,8),(9,15,9),(10,17,10),(11,18,11),(12,19,12),(13,20,13),(14,11,14),(15,12,15),(16,16,16),(17,17,17),(18,18,18),(19,19,19),(20,20,20);
+INSERT INTO `major_job` VALUES (1,1,1),(2,2,2),(3,3,3),(6,6,6),(7,7,7),(8,8,8),(9,9,9),(27,10,10),(28,5,11),(12,5,12),(13,4,13),(14,4,14),(15,4,15),(16,4,16),(17,4,17),(18,4,18),(19,4,19),(20,4,20),(21,4,21),(22,5,22),(23,4,23),(24,4,24),(25,4,25),(26,4,26),(31,1,27),(34,4,28),(36,3,30);
 /*!40000 ALTER TABLE `major_job` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -406,10 +439,10 @@ CREATE TABLE `user` (
   `password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `register_date` datetime NOT NULL,
   `role` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` bit(2) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -418,13 +451,9 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin1','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:37:00','ROLE_ADMIN',1),(2,'admin2','$2a$10$RS7JRY1u3rkhEcN/hDJziOG/b4/7aKtYW/Q5LLpxU2LMdiZAVB/fa','2025-04-25 16:38:00','ROLE_ADMIN',1),(3,'admin3','$2a$10$RS7JRY1u3rkhEcN/hDJziOG/b4/7aKtYW/Q5LLpxU2LMdiZAVB/fa','2025-04-25 16:39:00','ROLE_ADMIN',1),(4,'ungvien1','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:40:00','ROLE_CANDIDATE',1),(5,'ungvien2','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:41:00','ROLE_CANDIDATE',1),(6,'ungvien3','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:42:00','ROLE_CANDIDATE',1),(7,'ungvien4','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:43:00','ROLE_CANDIDATE',1),(8,'ungvien5','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:44:00','ROLE_CANDIDATE',1),(9,'ungvien6','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:45:00','ROLE_CANDIDATE',1),(10,'ungvien7','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:46:00','ROLE_CANDIDATE',1),(11,'ungvien8','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:47:00','ROLE_CANDIDATE',1),(12,'ungvien9','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:48:00','ROLE_CANDIDATE',1),(13,'ungvien10','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:49:00','ROLE_CANDIDATE',1),(14,'ungvien11','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:50:00','ROLE_CANDIDATE',1),(15,'ungvien12','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:51:00','ROLE_CANDIDATE',1),(16,'ungvien13','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:52:00','ROLE_CANDIDATE',1),(17,'ungvien14','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:53:00','ROLE_CANDIDATE',1),(18,'ungvien15','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:54:00','ROLE_CANDIDATE',1),(19,'ungvien16','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:55:00','ROLE_CANDIDATE',1),(20,'ungvien17','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:56:00','ROLE_CANDIDATE',1),(21,'ungvien18','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:57:00','ROLE_CANDIDATE',1),(22,'ungvien19','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:58:00','ROLE_CANDIDATE',1),(23,'ungvien20','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:59:00','ROLE_CANDIDATE',1),(24,'congty1','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:00:00','ROLE_COMPANY',1),(25,'congty2','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:01:00','ROLE_COMPANY',1),(26,'congty3','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:02:00','ROLE_COMPANY',1),(27,'congty4','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:03:00','ROLE_COMPANY',1),(28,'congty5','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:04:00','ROLE_COMPANY',1),(29,'congty6','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:05:00','ROLE_COMPANY',1),(30,'congty7','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:06:00','ROLE_COMPANY',1),(31,'congty8','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:07:00','ROLE_COMPANY',1),(32,'congty9','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:08:00','ROLE_COMPANY',1),(33,'congty10','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:09:00','ROLE_COMPANY',1),(34,'congty11','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:10:00','ROLE_COMPANY',1),(35,'congty12','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:11:00','ROLE_COMPANY',1),(36,'congty13','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:12:00','ROLE_COMPANY',1),(37,'congty14','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:13:00','ROLE_COMPANY',1),(38,'congty15','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:14:00','ROLE_COMPANY',1),(39,'congty16','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:15:00','ROLE_COMPANY',1),(40,'congty17','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:16:00','ROLE_COMPANY',1),(41,'congty18','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:17:00','ROLE_COMPANY',1),(42,'congty19','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:18:00','ROLE_COMPANY',1),(43,'congty20','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 17:19:00','ROLE_COMPANY',1);
+INSERT INTO `user` VALUES (1,'a@gmail.com','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2024-04-12 00:00:00','ROLE_COMPANY',_binary ''),(2,'admin2','123456','2025-04-25 16:37:12','ROLE_ADMIN',_binary ''),(3,'admin3','$2a$10$5X9k5N1sTc1/CjVH5XJoje3QMYijH3ETpgkox00R0MdPaJPPrf7wO','2025-04-25 16:41:12','ROLE_ADMIN',_binary ''),(7,'admin7','123456','2025-04-27 16:06:31','ROLE_ADMIN',_binary ''),(8,'admin8','123456','2025-04-27 16:06:31','ROLE_ADMIN',_binary ''),(13,'admin13','123456','2025-04-27 16:06:31','ROLE_ADMIN',_binary ''),(14,'admin14','123456','2025-04-27 16:06:31','ROLE_ADMIN',_binary ''),(18,'admin18','123456','2025-04-27 16:06:31','ROLE_ADMIN',_binary ''),(21,'user3','password3','2025-04-03 00:00:00','CANDIDATE',_binary ''),(23,'user5','password5','2025-04-05 00:00:00','CANDIDATE',_binary ''),(24,'user6','password6','2025-04-06 00:00:00','CANDIDATE',_binary ''),(25,'user7','password7','2025-04-07 00:00:00','CANDIDATE',_binary ''),(33,'user15','password15','2025-04-15 00:00:00','CANDIDATE',_binary ''),(40,'nhanvien','$2a$10$ZMOYhzCnmJB5QuHZfKGAg.n7T.PJH86ixRX.IoPc8EZrg7.kgWDA2','2025-05-01 03:55:01','ROLE_COMPANY',_binary ''),(45,'dat55','$2a$10$HSJ2vXR108swlgEwlIOnQONe2SJDa2F8csKefCrje.GP14wxuG4re','2025-05-01 14:21:39','ROLE_COMPANY',_binary ''),(54,'nva','$2a$10$/2RWYF1VMU/6zYFFvOSKeuWSrRJFOkwaSyrr.7h3A56Rge/C/8qv2','2025-05-10 00:13:24','ROLE_CANDIDATE',_binary ''),(55,'abc_company','$2a$10$v5CUYXPGYXHIPoPLsLfdwOafDPGbRtM1AYdjiFVZl34Y1oyum4coy','2025-05-10 00:27:58','ROLE_COMPANY',_binary ''),(56,'candidate','$2a$10$nd3S2JNIo0UZQuEUSkgsHOW3TvPP0sy0EX5mM2mJ3ivEigsnWBTnG','2025-05-10 00:41:37','ROLE_CANDIDATE',_binary ''),(57,'can','$2a$10$zgdJqEU2WxAJS3cqgT1bC.xkN7Ki1716d72C8SvLiLW6kFyaWfvt2','2025-05-10 00:44:50','ROLE_CANDIDATE',_binary ''),(58,'nhanvien0','$2a$10$8LD3Kg8YNj9t3cmJ1xKaL.ivISHiO27.AVdr8J9PFTxql6hsIsisu','2025-05-10 01:25:33','ROLE_CANDIDATE',_binary ''),(59,'company77','$2a$10$v/uLRG.6cYKYcVndZzmIGeHwB7S7e4zwM4riquewZDzkExHKon9TS','2025-05-10 15:25:44','ROLE_COMPANY',_binary ''),(61,'hqd123456','$2a$10$Vdm5ttnRf9iI2.wOSCgL1u.eUkH8LKnil7meeKaaB3YkXmu634o/W','2025-05-17 16:14:39','ROLE_CANDIDATE',_binary ''),(67,'dathqd3343@gamail.com','$2a$10$hZUaqpXrHDrLsrcr7liwFe/3OTx.CDy4jqpQ8yw.d/cJUlyd4uziC','2025-05-25 17:59:08','ROLE_CANDIDATE',_binary ''),(68,'aadmin12345','$2a$10$SFEzaWJZrDV7q4m3VFMoeO0/d8IVCbj8xKCJb9S9GYWno4aoz/gMu','2025-05-26 09:56:33','ROLE_COMPANY',_binary ''),(69,'admin12345678','$2a$10$4iP7IY5MzMLztC/GnKcDEeSnVGaC2iaPrql85rZhBes54w3VwzQwa','2025-05-26 10:30:49','ROLE_COMPANY',_binary ''),(75,'congty098765','$2a$10$WOTIRC7GmeXrR38rjXSsk.VpKEm01/hN/hSIa6MuNGbmwXVbWzEoW','2025-05-26 13:20:27','ROLE_COMPANY',_binary ''),(81,'16quangjdat@gmail.com','$2a$10$Jbifp2obAfDYHp1VyGD07uF8ojAZ/3JaJDgbekpTWE3qI/zSr4gVa','2025-05-27 01:26:35','ROLE_CANDIDATE',_binary ''),(86,'2251012030ddat@ou.edu.vn','$2a$10$iPoG1CAkWGLPA7Tct3nr1O9fmUzmIAocaWdLf1TsN2Elq5tL40rzC','2025-05-27 15:31:31','ROLE_CANDIDATE',_binary ''),(87,'hqd111lv@gmail.com','$2a$10$xsZN5bvPhJEKQFwUdzy8TO6wNl4vjUYwxZRRJc3qXgKB2fjD461hq','2025-05-27 17:08:24','ROLE_COMPANY',_binary ''),(88,'dathqd3333@gmail.com','$2a$10$cX063IjJzOvKfxaYUDQ9MeIUD8GR7x.aqbL7N5viXGJR91hqtALKG','2025-05-27 18:32:27','ROLE_CANDIDATE',_binary ''),(89,'dat@gmail.com','$2a$10$ws3YiHNUqIjdohXCzzwRWOQo9/F7UY8CLU6RMYHyA3AjmnUXhVTrG','2025-05-27 18:43:06','ROLE_CANDIDATE',_binary ''),(90,'dathqd3433@gmail.com','$2a$10$z1t52HE03NxayiFLWP/pLOW/cv.ecoty5CTp6tfANPZE09tQzQHPi','2025-05-27 20:57:21','ROLE_CANDIDATE',_binary ''),(91,'dathqd333@gmail.com','$2a$10$9BdGDDqgIl3lndYc0VD5yuME0pENNEDuktLEYhQRIoi2GiJbXayGC','2025-05-27 21:08:33','ROLE_COMPANY',_binary ''),(92,'trunghauu71@gmail.com','$2a$10$3wpGnHGH0l9SSLe1JBNKCuOAs8Kmoy36zOgIJlfz8wzfLQAeTnBYy','2025-05-28 22:23:49','ROLE_COMPANY',_binary ''),(93,'2251012030dat@ou.edu.vn','$2a$10$FyiBlloC77.wwA1c4Qfw4uvvFKoH6NqjLgnpYpHh9mHiNE4E.FkVS','2025-05-29 23:48:26','ROLE_CANDIDATE',_binary ''),(94,'166quangdat@gmail.com','$2a$10$39Zw82x1fvg5Lm/kT9YVQu5ed3raCxCyLidR4Xh2SDneoKOxRSSgC','2025-05-29 23:59:52','ROLE_CANDIDATE',_binary ''),(95,'hqd11lv@gmail.com','$2a$10$w8CbjSZ.e0Kn7Xf.c4QzQ.nV8z2bDgMpaw6o5EMYD/bc3P7rlCPw2','2025-05-30 00:04:25','ROLE_COMPANY',_binary ''),(96,'116quangdat@gmail.com','$2a$10$D.TB51.HNHE6pPDqiPS9LenVVQZkGwLwSXMUm1t9K04YJOdL/tNFa','2025-05-31 16:10:38','ROLE_CANDIDATE',_binary '');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping routines for database 'jobdb'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -435,4 +464,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-30 19:32:41
+-- Dump completed on 2025-06-01 10:12:22

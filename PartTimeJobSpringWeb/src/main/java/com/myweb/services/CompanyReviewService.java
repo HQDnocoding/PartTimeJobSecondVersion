@@ -6,6 +6,7 @@ package com.myweb.services;
 
 import com.myweb.dto.CreateCompanyReviewDTO;
 import com.myweb.dto.GetCompanyReviewDTO;
+import com.myweb.pojo.CompanyReview;
 import java.security.Principal;
 import java.util.Map;
 
@@ -22,6 +23,6 @@ public interface CompanyReviewService {
     void deleteReview(Integer id, Principal principal);
 
     Double getAverageRating(Integer companyId);
+    CompanyReview getReviewByApplicationId(Integer applicationId);
     
-    Map<String, Object> getReviewsByCandidate(Map<String, String> params, Integer candidateId);
 }

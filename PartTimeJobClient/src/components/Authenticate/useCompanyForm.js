@@ -28,14 +28,14 @@ const useCompanyForm = (navigate, setCooldown) => {
   const { validate: validateUsername, error: usernameError } = useValidateUsername();
 
   const validateTaxCode = (taxCode) => {
-    const taxCodeRegex = /^\d{10}(\d{3})?$/; // Mã số thuế 10 hoặc 13 chữ số
+    const taxCodeRegex = /^\d{10}(\d{3})?$/; // 10 hoặc 13 chữ số
     return taxCodeRegex.test(taxCode);
   };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 5 * 1024 * 1024;
       const validTypes = ['image/jpeg', 'image/png'];
       for (let file of files) {
         if (file.size > maxSize) {

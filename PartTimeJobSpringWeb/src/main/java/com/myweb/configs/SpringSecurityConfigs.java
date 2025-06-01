@@ -86,7 +86,6 @@ public class SpringSecurityConfigs {
                 .requestMatchers("/admin/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/api/admin/**").hasRole(GeneralUtils.Role.ROLE_ADMIN.getShortName())
                 .requestMatchers("/api/jobs/**").permitAll()
-                .requestMatchers(HttpMethod.PATCH, "/api/secure/applications/update-status").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers(HttpMethod.GET, "/api/secure/applications/**").hasAnyRole(GeneralUtils.Role.ROLE_CANDIDATE.getShortName(), GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers("/api/secure/jobs/**").hasRole(GeneralUtils.Role.ROLE_COMPANY.getShortName())
                 .requestMatchers("/api/jobs/**").permitAll()

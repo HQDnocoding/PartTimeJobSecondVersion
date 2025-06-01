@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selectedDistrict = object && object.district ? object.district : '';
 
         selectedCity = mapToApiFormat(selectedCity, true);
-        selectedDistrict = mapToApiFormat(selectedDistrict, false);
+        selectedDistrict = mapToApiFormat(selectedaDistrict, false);
 
         console.log("0", selectedCity);
 

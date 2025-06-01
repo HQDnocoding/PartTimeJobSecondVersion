@@ -57,6 +57,11 @@ public class CompanyReviewServiceImplement implements CompanyReviewService {
             throw new SecurityException("Only candidates can create company reviews.");
         }
 
+        CompanyReview existingReview = reviewRepository.findByApplicationId(dto.getApplicationId());
+        if (existingReview != null) {
+            throw new IllegalArgumentException("A review for this application already exists.");
+        }
+
         Candidate candidate = candidateRepository.getCandidateById(dto.getCandidateId());
         Job job = jobRepository.getJobById(dto.getJobId());
 
@@ -116,8 +121,8 @@ public class CompanyReviewServiceImplement implements CompanyReviewService {
             throw new IllegalArgumentException("Review not found.");
         }
 
-        if (!user.getRole().equals(GeneralUtils.Role.ROLE_CANDIDATE.toString()) ||
-            !review.getCandidateId().getUserId().getId().equals(user.getId())) {
+        if (!user.getRole().equals(GeneralUtils.Role.ROLE_CANDIDATE.toString())
+                || !review.getCandidateId().getUserId().getId().equals(user.getId())) {
             throw new SecurityException("You are not authorized to update this review.");
         }
 
@@ -140,10 +145,10 @@ public class CompanyReviewServiceImplement implements CompanyReviewService {
             throw new IllegalArgumentException("Review not found.");
         }
 
-        if (!user.getRole().equals(GeneralUtils.Role.ROLE_CANDIDATE.toString()) &&
-            !user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString()) ||
-            (!user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString()) &&
-             !review.getCandidateId().getUserId().getId().equals(user.getId()))) {
+        if (!user.getRole().equals(GeneralUtils.Role.ROLE_CANDIDATE.toString())
+                && !user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString())
+                || (!user.getRole().equals(GeneralUtils.Role.ROLE_ADMIN.toString())
+                && !review.getCandidateId().getUserId().getId().equals(user.getId()))) {
             throw new SecurityException("You are not authorized to delete this review.");
         }
 
@@ -154,9 +159,9 @@ public class CompanyReviewServiceImplement implements CompanyReviewService {
     public Double getAverageRating(Integer companyId) {
         return reviewRepository.getAverageRating(companyId);
     }
-    
+
     @Override
-    public Map<String, Object> getReviewsByCandidate(Map<String, String> params, Integer candidateId) {
-        return reviewRepository.getReviewsByCandidate(params, candidateId);
+    public CompanyReview getReviewByApplicationId(Integer applicationId) {
+        return reviewRepository.findByApplicationId(applicationId);
     }
 }

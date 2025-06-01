@@ -19,5 +19,5 @@ public interface CompanyReviewRepository {
 
     Double getAverageRating(Integer companyId);
     
-    Map<String, Object> getReviewsByCandidate(Map<String, String> params, Integer candidateId);
+    CompanyReview findByApplicationId(Integer applicationId);
 }

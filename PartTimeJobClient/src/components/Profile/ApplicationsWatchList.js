@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Table, Pagination, Badge, Button, Form, Row, Col } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './applicationsList.scss';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 import { authApis, endpoints } from '../../configs/APIs';
-import { states } from '../../utils/rolesAndStatus';
+import roles, { states } from '../../utils/rolesAndStatus';
+import { MyUserContext } from '../../configs/Contexts';
 
 const ApplicationsWatchList = () => {
   const [applications, setApplications] = useState([]);
@@ -21,9 +22,8 @@ const ApplicationsWatchList = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
+  const user = useContext(MyUserContext);
 
-  // Load dữ liệu từ API
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -47,7 +47,6 @@ const ApplicationsWatchList = () => {
         } else {
           toast.error('Không thể tải danh sách ứng tuyển');
         }
-
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error);
         toast.error(error.response?.data?.message || 'Lỗi khi tải dữ liệu');
@@ -59,11 +58,10 @@ const ApplicationsWatchList = () => {
   }, [filters, sortBy, sortOrder, pagination.currentPage]);
 
   useEffect(() => {
-    console.log(applications);
+    console.log('Applications:', applications);
+    console.log('User:', user);
+  }, [applications, user]);
 
-  }, [applications])
-
-  // Xử lý chuyển trang
   const handlePageChange = (page) => {
     if (page >= 1 && page <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, currentPage: page }));
@@ -136,7 +134,6 @@ const ApplicationsWatchList = () => {
     return items;
   };
 
-  // Định dạng ngày
   const formatDate = (timestamp) => {
     return new Date(timestamp).toLocaleDateString('vi-VN', {
       year: 'numeric',
@@ -147,14 +144,12 @@ const ApplicationsWatchList = () => {
     });
   };
 
-  // Xử lý bộ lọc
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
-    setPagination((prev) => ({ ...prev, currentPage: 1 })); // Reset về trang 1 khi lọc
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
-  // Xử lý sắp xếp
   const handleSortChange = (e) => {
     const [newSortBy, newSortOrder] = e.target.value.split('|');
     setSortBy(newSortBy);
@@ -162,11 +157,41 @@ const ApplicationsWatchList = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
+  const handleReview = async (app) => {
+    if (app && app.status === states['application was approved'] && user?.role === roles.candidate) {
+      try {
+        // Kiểm tra trạng thái ứng tuyển
+        const response = await authApis().get(`/secure/applications/${app.id}`);
+        console.log("ok",response.data.dat)
+        if (response.data.data.status !== states['application was approved']) {
+          toast.error('Ứng tuyển chưa được phê duyệt.');
+          return;
+        }
+
+        // Lưu dữ liệu vào localStorage
+        localStorage.setItem(
+          'reviewData',
+          JSON.stringify({
+            applicationId: app.id,
+            candidateId: app.candidateId.id,
+            companyId: app.jobId.companyId.id,
+            jobId: app.jobId.id, // Thêm jobId
+          })
+        );
+        navigate(`/detail-job/${app.jobId.id}`);
+      } catch (error) {
+        console.error('Lỗi khi kiểm tra ứng tuyển:', error);
+        toast.error('Không thể xác minh trạng thái ứng tuyển.');
+      }
+    } else {
+      toast.error('Bạn không có quyền đánh giá hoặc đơn ứng tuyển chưa được duyệt.');
+    }
+  };
+
   return (
     <div className="applications-page">
       <h1 className="page-title">Danh sách ứng tuyển</h1>
 
-      {/* Bộ lọc */}
       <Card className="filter-card shadow-sm mb-4">
         <Card.Body>
           <Row className="g-3">
@@ -201,7 +226,6 @@ const ApplicationsWatchList = () => {
         </Card.Body>
       </Card>
 
-      {/* Bảng danh sách */}
       <Card className="applications-card shadow-sm">
         <Card.Body>
           <Table responsive hover className="applications-table">
@@ -214,12 +238,13 @@ const ApplicationsWatchList = () => {
                 <th>Ngày ứng tuyển</th>
                 <th>Trạng thái</th>
                 <th>CV</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="text-center">
+                  <td colSpan="8" className="text-center">
                     Đang tải...
                   </td>
                 </tr>
@@ -251,11 +276,22 @@ const ApplicationsWatchList = () => {
                         Xem CV
                       </Button>
                     </td>
+                    <td>
+                      {app.status === states['application was approved'] && user?.role === roles.candidate && (
+                        <Button
+                          variant="info"
+                          size="sm"
+                          onClick={() => handleReview(app)}
+                        >
+                          Đánh giá công ty
+                        </Button>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center">
+                  <td colSpan="8" className="text-center">
                     Không có ứng tuyển nào.
                   </td>
                 </tr>
@@ -263,7 +299,6 @@ const ApplicationsWatchList = () => {
             </tbody>
           </Table>
 
-          {/* Phân trang */}
           {pagination.totalPages > 1 && (
             <div className="applications-pagination-wrapper">
               <div className="pagination-info">

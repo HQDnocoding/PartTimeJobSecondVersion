@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/APIs";
 import { toast } from "react-hot-toast";
 import MySpinner from "../layout/MySpinner";
 import CompanyReview from "../Review/CompanyReview";
-import "./JobDetail.scss";
+import cookie from "react-cookies";
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -13,46 +13,96 @@ const JobDetail = () => {
   const [job, setJob] = useState(state?.job || null);
   const [loading, setLoading] = useState(!state?.job);
   const [hasImageError, setHasImageError] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const navigate = useNavigate();
+  const savedReviewData = JSON.parse(localStorage.getItem("reviewData")) || {};
+  const reviewData = state || savedReviewData;
 
   useEffect(() => {
-    if (!job) {
-      const fetchJob = async () => {
+    const fetchJob = async () => {
+      if (!job) {
         try {
           setLoading(true);
           const res = await authApis().get(endpoints.jobDetail(id));
           const jobData = res.data.data;
-          const majorJob = jobData.majorJobCollection?.[0];
-          const dayJobs = jobData.dayJobCollection || [];
           setJob({
             ...jobData,
             companyName: jobData.companyId?.name || "N/A",
-            majorName: majorJob?.majorId?.name || "Chưa xác định",
-            dayNames: dayJobs.map((dj) => dj.dayId?.name).filter((name) => name) || [],
+            majorName: jobData.majorJobCollection?.[0]?.majorId?.name || "Chưa xác định",
+            dayNames: jobData.dayJobCollection?.map((dj) => dj.dayId?.name).filter((name) => name) || [],
             fullAddress: jobData.fullAddress || "Không có địa chỉ",
             district: jobData.district || "Không xác định",
             city: jobData.city || "Không xác định",
           });
         } catch (ex) {
           console.error("Lỗi khi tải chi tiết công việc:", ex);
-          toast.error("Không thể tải chi tiết công việc!");
-          setHasImageError(true);
+          if (ex.response?.status === 401 || ex.message === "No authentication token found. Please log in.") {
+            toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+            cookie.remove("token", { path: "/" });
+            localStorage.removeItem("token");
+            navigate("/login");
+          } else {
+            toast.error("Không thể tải chi tiết công việc!");
+            setHasImageError(true);
+          }
         } finally {
           setLoading(false);
         }
-      };
-      fetchJob();
+      }
+    };
+    fetchJob();
+  }, [id, navigate, job]);
+
+  useEffect(() => {
+  const checkReviewEligibility = async () => {
+    if (reviewData?.applicationId) {
+      try {
+        const token = cookie.load("token") || localStorage.getItem("token");
+        if (!token) {
+          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          navigate("/login");
+          return;
+        }
+
+        // Kiểm tra trạng thái ứng tuyển
+        const appResponse = await authApis().get(endpoints.getApplicationDetail(reviewData.applicationId));
+        if (appResponse.data.data.status !== "application was approved") {
+          toast.error("Ứng tuyển chưa được phê duyệt, không thể đánh giá.");
+          return;
+        }
+
+        // Kiểm tra xem đã có đánh giá chưa
+        const reviewResponse = await authApis().get(endpoints.getReviewByApplicationId(reviewData.applicationId));
+        if (!reviewResponse.data) {
+          setCanReview(true);
+        } else {
+          toast.info("Bạn đã gửi đánh giá cho công việc này.");
+        }
+      } catch (error) {
+        console.error("Lỗi khi kiểm tra trạng thái ứng tuyển:", error);
+        if (error.response?.status === 401 || error.message === "No authentication token found. Please log in.") {
+          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          cookie.remove("token", { path: "/" });
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else if (error.response?.status === 404) {
+          toast.error("Không tìm thấy ứng tuyển để xác minh.");
+        } else {
+          toast.error("Không thể xác minh trạng thái ứng tuyển.");
+        }
+      }
     }
-  }, [id]);
+  };
+  checkReviewEligibility();
+}, [reviewData, navigate]);
 
   const processedJob = useMemo(() => {
     if (!job) return null;
-    const majorJob = job.majorJobCollection?.[0];
-    const dayJobs = job.dayJobCollection || [];
     return {
       ...job,
       companyName: job.companyId?.name || "N/A",
-      majorName: majorJob?.majorId?.name || "Chưa xác định",
-      dayNames: dayJobs.map((dj) => dj.dayId?.name).filter((name) => name) || [],
+      majorName: job.majorJobCollection?.[0]?.majorId?.name || "Chưa xác định",
+      dayNames: job.dayJobCollection?.map((dj) => dj.dayId?.name).filter((name) => name) || [],
       fullAddress: job.fullAddress || "Không có địa chỉ",
       district: job.district || "Không xác định",
       city: job.city || "Không xác định",
@@ -83,18 +133,10 @@ const JobDetail = () => {
           <Card.Title className="job-title">{processedJob.jobName}</Card.Title>
           <Row className="align-items-start">
             <Col md={6} className="ps-0">
-              <Card.Text className="mb-2">
-                <strong>Công ty:</strong> {processedJob.companyName}
-              </Card.Text>
-              <Card.Text className="mb-2">
-                <strong>Ngày đăng:</strong> {new Date(processedJob.postedDate).toLocaleDateString("vi-VN")}
-              </Card.Text>
-              <Card.Text className="mb-2">
-                <strong>Mô tả:</strong> {processedJob.description}
-              </Card.Text>
-              <Card.Text className="mb-2">
-                <strong>Yêu cầu:</strong> {processedJob.jobRequired}
-              </Card.Text>
+              <Card.Text className="mb-2"><strong>Công ty:</strong> {processedJob.companyName}</Card.Text>
+              <Card.Text className="mb-2"><strong>Ngày đăng:</strong> {new Date(processedJob.postedDate).toLocaleDateString("vi-VN")}</Card.Text>
+              <Card.Text className="mb-2"><strong>Mô tả:</strong> {processedJob.description}</Card.Text>
+              <Card.Text className="mb-2"><strong>Yêu cầu:</strong> {processedJob.jobRequired}</Card.Text>
               <Card.Text className="mb-2">
                 <strong>Mức lương:</strong>{" "}
                 {processedJob.salaryMin && processedJob.salaryMax
@@ -106,18 +148,14 @@ const JobDetail = () => {
               <Card.Text className="mb-2">
                 <strong>Địa điểm:</strong> {processedJob.fullAddress !== "Không có địa chỉ" ? processedJob.fullAddress : ""}{processedJob.district !== "Không xác định" ? `, ${processedJob.district}` : ""}{processedJob.city !== "Không xác định" ? `, ${processedJob.city}` : ""}
               </Card.Text>
-              <Card.Text className="mb-2">
-                <strong>Kinh nghiệm:</strong> {processedJob.experienceRequired ? `${processedJob.experienceRequired} năm` : "Không yêu cầu"}
-              </Card.Text>
+              <Card.Text className="mb-2"><strong>Kinh nghiệm:</strong> {processedJob.experienceRequired ? `${processedJob.experienceRequired} năm` : "Không yêu cầu"}</Card.Text>
               <Card.Text className="mb-2">
                 <strong>Độ tuổi:</strong>{" "}
                 {processedJob.ageFrom && processedJob.ageTo
                   ? `${processedJob.ageFrom} - ${processedJob.ageTo} tuổi`
                   : "Không yêu cầu"}
               </Card.Text>
-              <Card.Text className="mb-2">
-                <strong>Ngành nghề:</strong> {processedJob.majorName}
-              </Card.Text>
+              <Card.Text className="mb-2"><strong>Ngành nghề:</strong> {processedJob.majorName}</Card.Text>
               <Card.Text className="mb-2">
                 <strong>Thời gian làm việc:</strong> {(processedJob.dayNames || []).length > 0 ? processedJob.dayNames.join(", ") : "Chưa xác định"}
               </Card.Text>
@@ -128,11 +166,20 @@ const JobDetail = () => {
               Ứng tuyển ngay
             </Button>
           </div>
-          <div className="mt-4">
-            <CompanyReview companyId={processedJob.companyId?.id} jobId={id} />
-          </div>
         </Card.Body>
       </Card>
+
+      {canReview && reviewData?.applicationId && (
+        <CompanyReview
+          applicationId={reviewData.applicationId}
+          jobId={reviewData.jobId || processedJob.id}
+          candidateId={reviewData.candidateId}
+          onReviewSubmitted={() => {
+            localStorage.removeItem("reviewData");
+            setCanReview(false);
+          }}
+        />
+      )}
     </Container>
   );
 };
