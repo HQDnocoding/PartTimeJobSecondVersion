@@ -22,6 +22,11 @@ const Login = () => {
         setError(null);
     };
 
+    const redirectAfterLogin = (userData) => {
+        const next = q.get('next');
+        navigate(next || '/');
+    };
+
     const login = async (e) => {
         e.preventDefault();
 
@@ -57,13 +62,7 @@ const Login = () => {
                 payload: userData.data,
             });
 
-            const role = userData.data.role;
-            let next = q.get('next');
-            if (role === 'ROLE_COMPANY' || role === 'ROLE_CANDIDATE') {
-                navigate(next ? next : '/');
-            } else {
-                navigate(next ? next : '/');
-            }
+            redirectAfterLogin(userData);
         } catch (ex) {
             if (ex.response) {
                 console.log(ex.response);
@@ -96,9 +95,9 @@ const Login = () => {
                 idToken: credentialResponse.credential,
             });
 
-            cookie.save('token', res.data.token);
+            cookie.save('token', res.data.token, { maxAge: 86400 });
             const userData = await authApis().get(endpoints['infor']);
-            cookie.save('user', userData.data);
+            cookie.save('user', userData.data, { maxAge: 86400 });
 
             console.log("Google User Info:", userData.data);
 
@@ -107,13 +106,7 @@ const Login = () => {
                 payload: userData.data,
             });
 
-            const role = userData.data.role;
-            let next = q.get('next');
-            if (role === 'ROLE_COMPANY' || role === 'ROLE_CANDIDATE') {
-                navigate(next ? next : '/');
-            } else {
-                navigate(next ? next : '/');
-            }
+            redirectAfterLogin(userData);
         } catch (ex) {
             if (ex.response) {
                 const status = ex.response.status;

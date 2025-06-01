@@ -63,7 +63,7 @@ const App = () => {
       <head >
         <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css' rel='stylesheet' />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></link>
-        <script src="https://kit.fontawesome.com/7c8192a424.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/7c8192a424.js" crossOrigin="anonymous"></script>
 
       </head>
       {!loading && <MyUserContext.Provider value={user}>

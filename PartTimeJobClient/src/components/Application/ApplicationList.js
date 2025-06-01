@@ -93,7 +93,7 @@ const ApplicationList = () => {
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
-        setPagination((prev) => ({ ...prev, currentPage: 1 })); // Reset to page 1 on filter change
+        setPagination((prev) => ({ ...prev, currentPage: 1 })); 
     };
 
     // Handle sort change
@@ -104,7 +104,7 @@ const ApplicationList = () => {
             setSortBy(field);
             setSortOrder('asc');
         }
-        setPagination((prev) => ({ ...prev, currentPage: 1 })); // Reset to page 1 on sort change
+        setPagination((prev) => ({ ...prev, currentPage: 1 })); 
     };
 
     // Handle page change
@@ -144,13 +144,11 @@ const ApplicationList = () => {
         }
     };
 
-    // Navigate to application detail
     const viewDetail = (applicationId) => {
         navigate(`/company/applications/${applicationId}`);
     };
 
 
-    // Render status badge
     const renderStatus = (status) => {
         switch (status) {
             case states['waiting for approving']:
@@ -207,7 +205,7 @@ const ApplicationList = () => {
                             {applications.map((app) => (
                                 <tr key={app.id} onClick={() => viewDetail(app.id)} className="application-row">
                                     <td>{app.id}</td>
-                                    <td>{app.candidateId?.fullName || 'N/A'}</td> {/* Adjusted to match backend field */}
+                                    <td>{app.candidateId?.fullName || 'N/A'}</td> 
                                     <td>{app.jobId?.jobName || 'N/A'}</td>
                                     <td>{formatDate(app.appliedDate)}</td>
                                     <td>{renderStatus(app.status)}</td>
