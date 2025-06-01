@@ -120,16 +120,16 @@ const ApplicationDetail = () => {
         );
     }
 
-    if (error) {
-        return (
-            <Container className="py-5">
-                <Alert variant="danger">{error}</Alert>
-                <Button variant="primary" onClick={handleBack}>
-                    Quay lại
-                </Button>
-            </Container>
-        );
-    }
+    // if (error) {
+    //     return (
+    //         <Container className="py-5">
+    //             <Alert variant="danger">{error}</Alert>
+    //             <Button variant="primary" onClick={handleBack}>
+    //                 Quay lại
+    //             </Button>
+    //         </Container>
+    //     );
+    // }
 
     if (!application) {
         return (
