@@ -24,4 +24,7 @@ public interface ApplicationRepository {
     void deleteApplication(int id);
 
     List<Application> findByJobIdAndStatus(Integer jobId, String status);
+    
+    List<Application> findByJobIdAndCandidateIdAndStatus(Integer jobId, Integer candidateId, String status);
+    
 }

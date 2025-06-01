@@ -18,4 +18,8 @@ public interface CandidateReviewRepository {
     void deleteReview(Integer id);
 
     Double getAverageRating(Integer candidateId);
+    
+    CandidateReview findByCandidateIdAndJobId(Integer candidateId, Integer jobId);
+    
+    Map<String, Object> getReviewsByCompany(Map<String, String> params, Integer companyId);
 }

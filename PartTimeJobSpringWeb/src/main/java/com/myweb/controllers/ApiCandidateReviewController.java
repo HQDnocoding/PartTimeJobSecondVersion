@@ -24,6 +24,7 @@ public class ApiCandidateReviewController {
 
     @PostMapping("/secure/candidate-reviews")
     public ResponseEntity<GetCandidateReviewDTO> createReview(@RequestBody CreateCandidateReviewDTO dto, Principal principal) {
+        System.out.println("Received request for creating review: " + dto.toString());
         GetCandidateReviewDTO review = reviewService.createReview(dto, principal);
         return new ResponseEntity<>(review, HttpStatus.CREATED);
     }
@@ -61,5 +62,13 @@ public class ApiCandidateReviewController {
     public ResponseEntity<Double> getAverageRating(@PathVariable("candidateId") Integer candidateId) {
         Double avgRating = reviewService.getAverageRating(candidateId);
         return new ResponseEntity<>(avgRating, HttpStatus.OK);
+    }
+
+    @GetMapping("/candidate-reviews/company/{companyId}")
+    public ResponseEntity<Map<String, Object>> getReviewsByCompany(
+            @PathVariable("companyId") Integer companyId,
+            @RequestParam(required = false) Map<String, String> params) {
+        Map<String, Object> result = reviewService.getReviewsByCompany(params, companyId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

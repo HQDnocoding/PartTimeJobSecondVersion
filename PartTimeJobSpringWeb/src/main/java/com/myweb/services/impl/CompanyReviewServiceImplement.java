@@ -154,4 +154,9 @@ public class CompanyReviewServiceImplement implements CompanyReviewService {
     public Double getAverageRating(Integer companyId) {
         return reviewRepository.getAverageRating(companyId);
     }
+    
+    @Override
+    public Map<String, Object> getReviewsByCandidate(Map<String, String> params, Integer candidateId) {
+        return reviewRepository.getReviewsByCandidate(params, candidateId);
+    }
 }

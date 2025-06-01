@@ -93,7 +93,7 @@ public class ApiJobController {
             return new ResponseEntity<>(Map.of("message", "Xóa thành công"), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(Map.of("message", "Lỗi hệ thống"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(Map.of("message", "Lỗi hệ thống","error",e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

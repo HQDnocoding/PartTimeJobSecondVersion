@@ -34,6 +34,7 @@ import java.util.Date;
     @NamedQuery(name = "CompanyReview.findByReview", query = "SELECT c FROM CompanyReview c WHERE c.review = :review"),
     @NamedQuery(name = "CompanyReview.findByReviewDate", query = "SELECT c FROM CompanyReview c WHERE c.reviewDate = :reviewDate"),
     @NamedQuery(name = "CompanyReview.findByRating", query = "SELECT c FROM CompanyReview c WHERE c.rating = :rating")})
+@NamedQuery(name = "CompanyReview.findByApplicationId", query = "SELECT c FROM CompanyReview c WHERE c.applicationId.id = :applicationId")
 public class CompanyReview implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,29 +43,33 @@ public class CompanyReview implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 200)
     @Column(name = "review")
     private String review;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "review_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date reviewDate;
-    
+
     @Column(name = "rating")
     private Integer rating;
-    
+
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Candidate candidateId;
-    
+
     @JoinColumn(name = "job_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Job jobId;
+
+    @JoinColumn(name = "application_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Application applicationId;
 
     public CompanyReview() {
     }
@@ -127,6 +132,14 @@ public class CompanyReview implements Serializable {
         this.jobId = jobId;
     }
 
+    public Application getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(Application applicationId) {
+        this.applicationId = applicationId;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -151,5 +164,5 @@ public class CompanyReview implements Serializable {
     public String toString() {
         return "com.myweb.pojo.CompanyReview[ id=" + id + " ]";
     }
-    
+
 }

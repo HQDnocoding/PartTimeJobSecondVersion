@@ -13,6 +13,7 @@ public class GetCompanyReviewDTO {
     private Integer id;
     private Integer candidateId;
     private Integer jobId;
+    private Integer applicationId;
     private Integer rating;
     private String review;
     private Date reviewDate;
@@ -22,6 +23,7 @@ public class GetCompanyReviewDTO {
         this.candidateId = review.getCandidateId().getId();
         this.jobId = review.getJobId().getId();
         this.rating = review.getRating();
+        this.applicationId = review.getApplicationId().getId();
         this.review = review.getReview();
         this.reviewDate = review.getReviewDate();
     }
@@ -49,6 +51,14 @@ public class GetCompanyReviewDTO {
 
     public void setJobId(Integer jobId) {
         this.jobId = jobId;
+    }
+
+    public Integer getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(Integer applicationId) {
+        this.applicationId = applicationId;
     }
 
     public Integer getRating() {

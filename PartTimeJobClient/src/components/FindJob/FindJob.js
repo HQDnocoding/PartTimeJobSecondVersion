@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useContext } from "react";
 import {
   Alert,
   Button,
@@ -17,24 +17,9 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import "./FindJob.scss";
 import { MyUserContext } from "../../configs/Contexts";
-import { useContext } from "react";
 import rolesAndStatus from "../../utils/rolesAndStatus";
 import APIs, { endpoints } from "../../configs/APIs";
 import AddressSelector from "./AddressSelector";
-
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
 
 const FindJob = () => {
   const user = useContext(MyUserContext);
@@ -52,8 +37,8 @@ const FindJob = () => {
   );
   const [distance, setDistance] = useState(parseFloat(q.get("distance")) || "");
   const [salaryRange, setSalaryRange] = useState([
-    parseFloat(q.get("minSalary")) || 0,
-    parseFloat(q.get("maxSalary")) || 100,
+    parseFloat(q.get("minSalary")) / 1000000 || 0,
+    parseFloat(q.get("maxSalary")) / 1000000 || 100,
   ]);
   const [experience, setExperience] = useState(parseInt(q.get("experience")) || -1);
   const [postedDays, setPostedDays] = useState(parseInt(q.get("postedDays")) || "");
@@ -81,21 +66,30 @@ const FindJob = () => {
   const handleAddressSelect = (addressData) => {
     setAddress(addressData.address);
     setCoordinates(addressData.coordinates);
+    // Log để kiểm tra địa chỉ và tọa độ từ AddressSelector
+    console.log("Address selected:", addressData.address);
+    console.log("Coordinates selected:", addressData.coordinates);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     const queryParams = {};
+
+    // Chỉ thêm các tham số bộ lọc không rỗng
     if (keyword.trim()) queryParams.keyword = keyword.trim();
     if (address.trim()) queryParams.address = address.trim();
-    if (coordinates.length === 2) queryParams.coordinates = coordinates.join(",");
-    if (distance) queryParams.distance = distance;
-    if (salaryRange[0] > 0) queryParams.minSalary = salaryRange[0];
-    if (salaryRange[1] < 100) queryParams.maxSalary = salaryRange[1];
+    if (coordinates.length === 2 && !isNaN(coordinates[0]) && !isNaN(coordinates[1]))
+      queryParams.coordinates = coordinates.join(",");
+    if (distance && !isNaN(distance) && distance > 0) queryParams.distance = distance;
+    if (salaryRange[0] > 0) queryParams.minSalary = salaryRange[0] * 1000000; // Chuyển sang VND
+    if (salaryRange[1] < 100) queryParams.maxSalary = salaryRange[1] * 1000000;
     if (experience >= 0) queryParams.experience = experience;
-    if (postedDays) queryParams.postedDays = postedDays;
+    if (postedDays > 0) queryParams.postedDays = postedDays;
     if (majorId) queryParams.majorId = majorId;
     if (dayId) queryParams.dayId = dayId;
+
+    // Log để kiểm tra queryParams trước khi gửi
+    console.log("Query params before search:", queryParams);
 
     setQ(queryParams);
     setPage(1);
@@ -119,7 +113,6 @@ const FindJob = () => {
     setJobs([]);
     setHasMore(true);
     setIsFiltered(false);
-    loadJobs();
   };
 
   const handleViewJob = async (jobId) => {
@@ -152,82 +145,48 @@ const FindJob = () => {
 
     try {
       setLoading(true);
-      const keyword = q.get("keyword") || "";
-      const addr = q.get("address") || "";
-      const coords = q.get("coordinates") ? q.get("coordinates").split(",").map(parseFloat) : [];
-      const dist = parseFloat(q.get("distance")) || Infinity;
-      const minSal = parseFloat(q.get("minSalary")) || 0;
-      const maxSal = parseFloat(q.get("maxSalary")) || Infinity;
-      const exp = parseInt(q.get("experience")) || -1;
-      const days = parseInt(q.get("postedDays")) || Infinity;
-      const major = q.get("majorId") || "";
-      const day = q.get("dayId") || "";
+      const authToken = localStorage.getItem('token');
+      const queryString = new URLSearchParams({
+        page,
+        isClient: "true",
+        ...(q.get("keyword") && { keyword: encodeURIComponent(q.get("keyword")) }),
+        ...(q.get("majorId") && { majorId: q.get("majorId") }),
+        ...(q.get("dayId") && { dayId: q.get("dayId") }),
+        ...(q.get("address") && { address: q.get("address") }),
+        ...(q.get("coordinates") && { coordinates: q.get("coordinates") }),
+        ...(q.get("distance") && { distance: q.get("distance") }),
+        ...(q.get("minSalary") && { minSalary: q.get("minSalary") }),
+        ...(q.get("maxSalary") && { maxSalary: q.get("maxSalary") }),
+        ...(q.get("experience") && { experience: q.get("experience") }),
+        ...(q.get("postedDays") && { postedDays: q.get("postedDays") }),
+      }).toString();
 
-      const url = `${endpoints.jobs}?page=${page}${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ""}${major ? `&majorId=${major}` : ""}${day ? `&dayId=${day}` : ""}&status=approved`;
-      const res = await APIs.get(url);
+      // Log query string để kiểm tra
+      console.log("Query string sent to backend:", queryString);
 
-      let newJobs = res.data.data.jobs || [];
-      newJobs = newJobs.map((job) => {
-        const majorJob = job.majorJobCollection?.[0];
-        const dayJobs = job.dayJobCollection || [];
-        return {
-          ...job,
-          companyName: job.companyId?.name || "N/A",
-          majorName: majorJob?.majorId?.name || "Chưa xác định",
-          dayNames: dayJobs.map((dj) => dj.dayId?.name).filter((name) => name) || [],
-          fullAddress: job.fullAddress || "Không có địa chỉ",
-          district: job.district || "Không xác định",
-          city: job.city || "Không xác định",
-        };
-      });
-
-      const isFiltering = addr || coords.length === 2 || dist !== Infinity || minSal > 0 || maxSal < 100 || exp !== -1 || days !== Infinity || major || day;
-      if (isFiltering) {
-        newJobs = newJobs.filter((job) => {
-          const jobLat = parseFloat(job.latitude) || 0;
-          const jobLng = parseFloat(job.longitude) || 0;
-          const salaryMin = job.salaryMin || 0;
-          const salaryMax = job.salaryMax || 0;
-
-          const currentDate = new Date("2025-05-29");
-          let jobPostedDate;
-          if (typeof job.postedDate === "string" && job.postedDate.includes("/")) {
-            jobPostedDate = new Date(job.postedDate.split("/").reverse().join("-"));
-          } else {
-            jobPostedDate = new Date(job.postedDate);
-          }
-          const daysDiff = Math.floor((currentDate - jobPostedDate) / (1000 * 60 * 60 * 24));
-
-          const jobExp = job.experienceRequired || 0;
-
-          let isWithinDistance = true;
-          if (coords.length === 2 && dist !== Infinity) {
-            if (!isNaN(coords[0]) && !isNaN(coords[1]) && jobLat && jobLng) {
-              const distToJob = calculateDistance(coords[1], coords[0], jobLat, jobLng);
-              isWithinDistance = distToJob <= dist;
-            } else {
-              isWithinDistance = false;
-            }
-          }
-
-          const matchesSalary =
-            (!minSal && maxSal === Infinity) ||
-            (salaryMin >= minSal * 1000000 && (maxSal === Infinity || salaryMax <= maxSal * 1000000));
-
-          const matchesExperience = exp === -1 || jobExp >= exp;
-          const matchesPostedDays = days === Infinity || daysDiff <= days;
-          const matchesMajor = !major || (job.majorJobCollection?.[0]?.majorId?.id === parseInt(major));
-          const matchesDay = !day || job.dayJobCollection?.some((dj) => dj.dayId?.id === parseInt(day));
-
-          return isWithinDistance && matchesSalary && matchesExperience && matchesPostedDays && matchesMajor && matchesDay;
+      const url = `${endpoints.jobs}?${queryString}`;
+      const res = await APIs.get(url, {
+            headers: { Authorization: `Bearer ${authToken}` }
         });
-      }
+
+      // Log chi tiết response
+      console.log("API response:", res.data);
+      console.log("Jobs in response:", res.data.data.jobs);
+      
+      let newJobs = res.data.data.jobs || [];
+      newJobs = newJobs.map((job) => ({
+        ...job,
+        companyName: job.companyId?.name || "N/A",
+        majorName: job.majorJobCollection?.[0]?.majorId?.name || "Chưa xác định",
+        dayNames: job.dayJobCollection?.map((dj) => dj.dayId?.name).filter(Boolean) || [],
+        fullAddress: job.fullAddress || "Không có địa chỉ",
+        district: job.district || "Không xác định",
+        city: job.city || "Không xác định",
+      }));
 
       setJobs((prev) => {
         const updatedJobs = page === 1 ? newJobs : [...prev, ...newJobs];
-        const uniqueJobs = Array.from(
-          new Map(updatedJobs.map((j) => [j.id, j])).values()
-        );
+        const uniqueJobs = Array.from(new Map(updatedJobs.map((j) => [j.id, j])).values());
         return uniqueJobs;
       });
 
@@ -452,7 +411,7 @@ const FindJob = () => {
                 <Card.Title className="card-title">{job.jobName || "Tên công việc không xác định"}</Card.Title>
                 <Card.Text className="card-text card-text-highlight">
                   <strong>Mức lương:</strong> {job.salaryMin && job.salaryMax
-                    ? `${job.salaryMin.toLocaleString("vi-VN")} - ${job.salaryMax.toLocaleString("vi-VN")} VNĐ`
+                    ? `${(job.salaryMin / 1000000).toLocaleString("vi-VN")} - ${(job.salaryMax / 1000000).toLocaleString("vi-VN")} triệu VNĐ`
                     : "Thỏa thuận"}
                 </Card.Text>
                 {(job.fullAddress !== "Không có địa chỉ" || job.district !== "Không xác định" || job.city !== "Không xác định") && (

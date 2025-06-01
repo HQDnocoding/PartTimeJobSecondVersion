@@ -4,6 +4,7 @@ import { useParams, useLocation, Link } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/APIs";
 import { toast } from "react-hot-toast";
 import MySpinner from "../layout/MySpinner";
+import CompanyReview from "../Review/CompanyReview";
 import "./JobDetail.scss";
 
 const JobDetail = () => {
@@ -11,7 +12,7 @@ const JobDetail = () => {
   const { state } = useLocation();
   const [job, setJob] = useState(state?.job || null);
   const [loading, setLoading] = useState(!state?.job);
-  const [hasImageError, setHasImageError] = useState(false); // Trạng thái để theo dõi lỗi tải ảnh
+  const [hasImageError, setHasImageError] = useState(false);
 
   useEffect(() => {
     if (!job) {
@@ -34,16 +35,15 @@ const JobDetail = () => {
         } catch (ex) {
           console.error("Lỗi khi tải chi tiết công việc:", ex);
           toast.error("Không thể tải chi tiết công việc!");
-          setHasImageError(true); // Đặt lỗi nếu API thất bại
+          setHasImageError(true);
         } finally {
           setLoading(false);
         }
       };
       fetchJob();
     }
-  }, [id]); // Chỉ phụ thuộc vào id
+  }, [id]);
 
-  // Sử dụng useMemo để tránh tính toán lại job khi không cần thiết
   const processedJob = useMemo(() => {
     if (!job) return null;
     const majorJob = job.majorJobCollection?.[0];
@@ -127,6 +127,9 @@ const JobDetail = () => {
             <Button as={Link} to={`/jobs/apply/${processedJob.id}`} variant="success">
               Ứng tuyển ngay
             </Button>
+          </div>
+          <div className="mt-4">
+            <CompanyReview companyId={processedJob.companyId?.id} jobId={id} />
           </div>
         </Card.Body>
       </Card>
