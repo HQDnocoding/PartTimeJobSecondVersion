@@ -217,20 +217,5 @@ public class ApplicationRepositoryImplement implements ApplicationRepository {
         query.where(predicates.toArray(new Predicate[0]));
         return session.createQuery(query).getResultList();
     }
-    
-    @Override
-    public List<Application> findByJobIdAndCandidateIdAndStatus(Integer jobId, Integer candidateId, String status) {
-        Session session = factory.getObject().getCurrentSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Application> query = builder.createQuery(Application.class);
-        Root<Application> root = query.from(Application.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        predicates.add(builder.equal(root.get("jobId").get("id"), jobId));
-        predicates.add(builder.equal(root.get("candidateId").get("id"), candidateId));
-        predicates.add(builder.equal(root.get("status"), status));
-
-        query.where(predicates.toArray(new Predicate[0]));
-        return session.createQuery(query).getResultList();
-    }
 }

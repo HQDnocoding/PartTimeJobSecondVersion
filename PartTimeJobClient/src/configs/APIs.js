@@ -55,6 +55,7 @@ export const endpoints = {
     'updateCandidateReview': (id) => `/secure/candidate-reviews/${id}`,
     'deleteCandidateReview': (id) => `/secure/candidate-reviews/${id}`,
     'getCandidateAverageRating': (candidateId) => `/candidate-reviews/candidate/${candidateId}/average`,
+    'getCandidateReviewsByCompany': (companyId) => `/candidate-reviews/company/${companyId}`,
 };
 
 export const authApis = () => {

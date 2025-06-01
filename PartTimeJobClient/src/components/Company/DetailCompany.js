@@ -6,8 +6,6 @@ import { Card, Spinner, Button, Carousel, Col, Row } from 'react-bootstrap';
 import { MyChatBoxContext, MyReceiverContext } from '../../configs/Contexts';
 import { toast } from 'react-hot-toast';
 import cookie from 'react-cookies';
-import CompanyReview from '../Review/CompanyReview'; // Import CompanyReview
-
 // Hàm kiểm tra URL hình ảnh hợp lệ
 const isValidImageUrl = async (url) => {
   try {
@@ -362,9 +360,6 @@ const DetailCompany = () => {
             </div>
 
             <div className="row mt-5">
-              <div className="col-12 text-start">
-                <CompanyReview companyId={id} /> {/* Gọi CompanyReview */}
-              </div>
             </div>
           </div>
         </>

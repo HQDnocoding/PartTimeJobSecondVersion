@@ -1,76 +1,13 @@
-.company-review {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    .section-title {
-        color: #2c3e50;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
+.company-review-card {
+  .star-rating {
+    display: flex;
+    font-size: 1.5rem;
+    cursor: pointer;
+    .star {
+      color: #ccc;
+      &.filled {
+        color: #ffc107;
+      }
     }
-
-    .card {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .table {
-        font-size: 0.9rem;
-        margin-bottom: 0;
-
-        td {
-            padding: 0.5rem;
-            vertical-align: middle;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-    }
-
-    .action-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-
-        .btn {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.9rem;
-            border-radius: 20px;
-        }
-    }
-
-    .alert {
-        font-size: 0.9rem;
-        text-align: center;
-    }
-
-    .modal-content {
-        border-radius: 8px;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: #34495e;
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 5px;
-        font-size: 0.9rem;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-    }
+  }
 }
