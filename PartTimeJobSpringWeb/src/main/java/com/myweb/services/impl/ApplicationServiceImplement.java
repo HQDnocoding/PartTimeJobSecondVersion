@@ -133,13 +133,17 @@ public class ApplicationServiceImplement implements ApplicationService {
 
     }
 
-    @Override
     public Application getApplicationDetailById(int id, String username) {
         User user = this.userRepo.getUserByUsername(username);
-        Application application = this.applicationRepository.getApplicationById(id);
-        if (Objects.equals(user.getCompany().getId(), application.getJobId().getCompanyId().getId())
-                || Objects.equals(user.getCandidate().getId(), application.getCandidateId().getId())) {
-            return application;
+        try {
+            Application application = this.applicationRepository.getApplicationById(id);
+            if (user.getCompany() != null && Objects.equals(user.getCompany().getId(), application.getJobId().getCompanyId().getId())) {
+                return application;
+            } else if (user.getCandidate() != null && Objects.equals(user.getCandidate().getId(), application.getCandidateId().getId())) {
+                return application;
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Không có vai trò phù hợp để thực hiện thao tác này");
         }
         return null;
     }

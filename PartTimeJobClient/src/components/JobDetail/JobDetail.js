@@ -5,7 +5,6 @@ import { authApis, endpoints } from "../../configs/APIs";
 import { toast } from "react-hot-toast";
 import MySpinner from "../layout/MySpinner";
 import CompanyReview from "../Review/CompanyReview";
-import cookie from "react-cookies";
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -19,8 +18,8 @@ const JobDetail = () => {
   const reviewData = state || savedReviewData;
 
   useEffect(() => {
-    const fetchJob = async () => {
-      if (!job) {
+    if (!job) {
+      const fetchJob = async () => {
         try {
           setLoading(true);
           const res = await authApis().get(endpoints.jobDetail(id));
@@ -36,11 +35,9 @@ const JobDetail = () => {
           });
         } catch (ex) {
           console.error("Lỗi khi tải chi tiết công việc:", ex);
-          if (ex.response?.status === 401 || ex.message === "No authentication token found. Please log in.") {
-            toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-            cookie.remove("token", { path: "/" });
-            localStorage.removeItem("token");
-            navigate("/login");
+          if (ex.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            navigate('/login');
           } else {
             toast.error("Không thể tải chi tiết công việc!");
             setHasImageError(true);
@@ -48,53 +45,40 @@ const JobDetail = () => {
         } finally {
           setLoading(false);
         }
-      }
-    };
-    fetchJob();
-  }, [id, navigate, job]);
+      };
+      fetchJob();
+    }
+  }, [id, navigate]);
 
   useEffect(() => {
-  const checkReviewEligibility = async () => {
-    if (reviewData?.applicationId) {
-      try {
-        const token = cookie.load("token") || localStorage.getItem("token");
-        if (!token) {
-          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-          navigate("/login");
-          return;
-        }
-
-        // Kiểm tra trạng thái ứng tuyển
-        const appResponse = await authApis().get(endpoints.getApplicationDetail(reviewData.applicationId));
-        if (appResponse.data.data.status !== "application was approved") {
-          toast.error("Ứng tuyển chưa được phê duyệt, không thể đánh giá.");
-          return;
-        }
-
-        // Kiểm tra xem đã có đánh giá chưa
-        const reviewResponse = await authApis().get(endpoints.getReviewByApplicationId(reviewData.applicationId));
-        if (!reviewResponse.data) {
-          setCanReview(true);
-        } else {
-          toast.info("Bạn đã gửi đánh giá cho công việc này.");
-        }
-      } catch (error) {
-        console.error("Lỗi khi kiểm tra trạng thái ứng tuyển:", error);
-        if (error.response?.status === 401 || error.message === "No authentication token found. Please log in.") {
-          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-          cookie.remove("token", { path: "/" });
-          localStorage.removeItem("token");
-          navigate("/login");
-        } else if (error.response?.status === 404) {
-          toast.error("Không tìm thấy ứng tuyển để xác minh.");
-        } else {
-          toast.error("Không thể xác minh trạng thái ứng tuyển.");
+    const checkReviewEligibility = async () => {
+      if (reviewData?.applicationId) {
+        try {
+          console.log("Token in localStorage:", localStorage.getItem("token"));
+          const response = await authApis().get(`/secure/applications/${reviewData.applicationId}`);
+          if (response.data.status === "approved") {
+            const reviewResponse = await authApis().get(`/company-reviews/application/${reviewData.applicationId}`);
+            if (!reviewResponse.data) {
+              setCanReview(true);
+            } else {
+              toast.info("Bạn đã gửi đánh giá cho công việc này.");
+            }
+          } else {
+            toast.error("Ứng tuyển chưa được phê duyệt, không thể đánh giá.");
+          }
+        } catch (error) {
+          console.error("Lỗi khi kiểm tra đánh giá:", error);
+          if (error.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            navigate('/login');
+          } else {
+            toast.error("Không thể xác minh quyền đánh giá.");
+          }
         }
       }
-    }
-  };
-  checkReviewEligibility();
-}, [reviewData, navigate]);
+    };
+    checkReviewEligibility();
+  }, [reviewData, navigate]);
 
   const processedJob = useMemo(() => {
     if (!job) return null;
@@ -174,6 +158,7 @@ const JobDetail = () => {
           applicationId={reviewData.applicationId}
           jobId={reviewData.jobId || processedJob.id}
           candidateId={reviewData.candidateId}
+          companyId={reviewData.companyId}
           onReviewSubmitted={() => {
             localStorage.removeItem("reviewData");
             setCanReview(false);

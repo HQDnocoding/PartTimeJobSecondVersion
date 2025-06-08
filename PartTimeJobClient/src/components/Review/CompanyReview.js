@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-import { authApis, endpoints } from "../../configs/APIs";
+import { authApis } from "../../configs/APIs";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import cookie from "react-cookies";
 
-const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted }) => {
+const CompanyReview = ({ applicationId, jobId, candidateId, companyId, onReviewSubmitted }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [error, setError] = useState(null);
@@ -13,56 +12,50 @@ const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted })
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!applicationId || !jobId || !candidateId) {
+    if (!applicationId || !jobId || !candidateId || !companyId) {
       setError("Thiếu thông tin cần thiết để đánh giá.");
     }
-  }, [applicationId, jobId, candidateId]);
+  }, [applicationId, jobId, candidateId, companyId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    if (!applicationId || !jobId || !candidateId || !companyId) {
+      setError("Vui lòng cung cấp đầy đủ thông tin.");
+      setLoading(false);
+      return;
+    }
+    if (rating < 1 || rating > 5) {
+      setError("Đánh giá phải từ 1 đến 5 sao.");
+      setLoading(false);
+      return;
+    }
+    if (!comment || comment.length > 200) {
+      setError("Bình luận không được để trống và tối đa 200 ký tự.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const token = cookie.load("token") || localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-      }
-
-      // Kiểm tra trạng thái ứng tuyển
-      const appResponse = await authApis().get(endpoints.getApplicationDetail(applicationId));
-      if (appResponse.data.data.status !== "application was approved") {
-        throw new Error("Ứng tuyển chưa được phê duyệt, không thể đánh giá.");
-      }
-
-      if (!applicationId || !jobId || !candidateId) {
-        setError("Vui lòng cung cấp đầy đủ thông tin.");
-        setLoading(false);
-        return;
-      }
-      if (rating < 1 || rating > 5) {
-        setError("Đánh giá phải từ 1 đến 5 sao.");
-        setLoading(false);
-        return;
-      }
-      if (!comment || comment.length > 200) {
-        setError("Bình luận không được để trống và tối đa 200 ký tự.");
-        setLoading(false);
-        return;
-      }
-
-      console.log("Sending payload:", { applicationId, jobId, candidateId, rating, review: comment });
-      const response = await authApis().post(endpoints.createCompanyReview, {
+      console.log("Sending payload:", { applicationId, jobId, candidateId, companyId, rating, comment });
+      console.log("Token in localStorage:", localStorage.getItem("token"));
+      // Sửa endpoint
+      const response = await authApis().post("/secure/company-reviews", {
         applicationId,
         jobId,
         candidateId,
+        companyId,
         rating,
-        review: comment,
+        comment,
       });
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         toast.success("Đánh giá đã được gửi thành công!");
-        onReviewSubmitted();
+        if (onReviewSubmitted) {
+          onReviewSubmitted();
+        }
         setRating(0);
         setComment("");
       } else {
@@ -70,23 +63,20 @@ const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted })
       }
     } catch (err) {
       console.error("Lỗi khi gửi đánh giá:", err);
-      if (err.message === "No authentication token found. Please log in." || err.response?.status === 401) {
-        setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-        cookie.remove("token", { path: "/" });
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else if (err.message === "Ứng tuyển chưa được phê duyệt, không thể đánh giá.") {
-        setError(err.message);
-      } else if (err.response) {
+      if (err.response) {
         switch (err.response.status) {
           case 400:
             setError(err.response.data.message || "Dữ liệu gửi đi không hợp lệ. Vui lòng kiểm tra lại.");
+            break;
+          case 401:
+            setError("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+            navigate('/login');
             break;
           case 403:
             setError("Bạn không có quyền gửi đánh giá.");
             break;
           case 404:
-            setError("Không tìm thấy tài nguyên.");
+            setError("Endpoint không tồn tại hoặc không tìm thấy tài nguyên.");
             break;
           case 500:
             setError("Lỗi server. Vui lòng thử lại sau.");
@@ -94,6 +84,8 @@ const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted })
           default:
             setError(`Lỗi không xác định: ${err.response.status}`);
         }
+      } else if (err.request) {
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối internet.");
       } else {
         setError(`Lỗi: ${err.message}`);
       }
@@ -116,7 +108,7 @@ const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted })
             value={rating}
             onChange={(e) => setRating(Math.min(5, Math.max(1, Number(e.target.value))))}
             required
-            disabled={loading || !!error}
+            disabled={!!error}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -127,7 +119,7 @@ const CompanyReview = ({ applicationId, jobId, candidateId, onReviewSubmitted })
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             required
-            disabled={loading || !!error}
+            disabled={!!error}
           />
         </Form.Group>
         <Button variant="primary" type="submit" disabled={loading || !!error}>
