@@ -2,9 +2,6 @@
 
 A **job management platform** for part-time jobs, developed with **Spring MVC, Thymeleaf, MySQL** for backend  
 and **ReactJS** for frontend.  
-This is the **second version** of the project with improved architecture, separating backend and frontend.  
-
-✨ New Features: **Google Login (OAuth2)** + **AI Chatbot Integration**  
 
 ---
 
